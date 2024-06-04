@@ -7,16 +7,16 @@ folder_name = "datasets"
 const datasetpath = joinpath(dirname(@__DIR__), folder_name)
 
 # Downloading dataset to test our algorithm from Github
-function download_data(url)
-    if !isdir(datasetpath)
-        mkdir(datasetpath)
-        LibGit2.clone(url, datasetpath)
-        print("Creating folder and downloading data...")
-    elseif isdir(datasetpath) && isempty(readdir(datasetpath))
-        print("Downloading data...")
-        LibGit2.clone(url, datasetpath)
+function download_data(url, datasetPath)
+    if !isdir(datasetPath)
+        mkdir(datasetPath)
+        LibGit2.clone(url, datasetPath)
+        print("Creating folder and downloading data... \n")
+    elseif isdir(datasetPath) && isempty(readdir(datasetPath))
+        print("Downloading data... \n")
+        LibGit2.clone(url, datasetPath)
     else
-        print("Data exist")
+        print("Data exist \n")
         data_preprocessing("wut", "x2")
     end
 end
@@ -59,4 +59,4 @@ function data_calculation(data; noise_factor=1e-6)
 end
 
 
-download_data("https://github.com/Omadzze/JlData.git")
+download_data("https://github.com/Omadzze/JlData.git", datasetpath)
