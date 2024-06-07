@@ -19,15 +19,13 @@ Create labeled data for testing K-means algorithm.
 - `labels`: A vector of labels corresponding to the data points.
 """
 function create_labeled_data(num_samples_per_class::Int, num_features::Int, num_classes::Int; spread::Number=10, seed::Int=12345)
-    Random.seed!(seed)  # Set the random seed for reproducibility
-    data = []  # Initialize an empty list for data points
-    labels = []  # Initialize an empty list for labels
+    Random.seed!(seed)
+    data = []
+    labels = []
     for i in 1:num_classes
 
         center = randn((1, num_features)) * (spread * log(num_classes))  # Generate a random center for each class
-
-        class_data = [center + randn((1, num_features)) for _ in 1:num_samples_per_class]
-        # Create data points around the center
+        class_data = [center + randn((1, num_features)) for _ in 1:num_samples_per_class] # Create data points around the center
         append!(data, class_data)  # Add the generated data points to the data list
         append!(labels, fill(i, num_samples_per_class))  # Add labels for each data point
     end
@@ -41,9 +39,8 @@ ks = [1, 2, 3, 5, 20]  # Selected values of k to test
 @testset "Cluster.jl" begin
 
     @testset "K-means Tests" begin
-        # Test basic functionality of the K-means algorithm
         @testset "Basic Functionality Tests" begin
-            for dim in dimensions  # Loop over selected dimensions
+            for dim in dimensions
                 @testset "Dimension: $dim" begin
 
                     # Test convergence on simple data
@@ -64,10 +61,9 @@ ks = [1, 2, 3, 5, 20]  # Selected values of k to test
             end
         end
 
-        # Test the correctness of the K-means algorithm
         @testset "Correctness Tests" begin
-            for k in ks  # Loop over selected k values
-                for dim in dimensions  # Loop over selected dimensions
+            for k in ks
+                for dim in dimensions
                     @testset "k: $k, Dimension: $dim" begin
                         # Test correct number of clusters
                         data, _ = create_labeled_data(num_samples, dim, k)
@@ -105,9 +101,8 @@ ks = [1, 2, 3, 5, 20]  # Selected values of k to test
             @test_throws ArgumentError kmeans(data, 2, max_iters="not_a_number")  # max_iters must be an integer
             @test_throws ArgumentError kmeans(data, "not_a_number")  # k must be an integer
             @test_throws ArgumentError kmeans("not_a_matrix", 2)  # data must be a matrix
-            #test mode
-
-
+            @test_throws ArgumentError kmeans(data, 2, mode=:invalid_mode)  # mode must be a valid symbol
+            @text_throws ArgumentError kmeans(data, 2, mode="invalid_mode")  # mode must be a valid symbol
         end
 
         @testset "Edge Cases Tests" begin
