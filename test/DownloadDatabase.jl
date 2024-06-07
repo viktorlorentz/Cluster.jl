@@ -1,3 +1,5 @@
+module DownloadDatabase
+
 using LibGit2
 using GZip
 using DelimitedFiles
@@ -87,3 +89,4 @@ end
 
 # download_data("https://github.com/Omadzze/JlData.git", datasetPath)
 # data, lables = data_preprocessing()
+end

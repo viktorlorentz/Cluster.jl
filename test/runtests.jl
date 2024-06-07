@@ -1,5 +1,7 @@
 using Test
 include("DataGenerator.jl")
+include("DownloadDatabase.jl")
+include("../src/Cluster.jl")
 using .DataGenerator
 
 const TRAIN_TEST_RATIO = 0.85
@@ -45,8 +47,29 @@ testCases = [
     #testCase(10000, 20, 10, "Very large dataset")
 ]
 
+
 @testset "Cluster.jl Tests" begin
     include("test_kmeans.jl")
     include("test_kmeanspp.jl")
     include("test_bkmeans.jl")
+end
+
+@testset "Cluster.jl Benchmarking" begin
+
+    
+folder_name = "test/datasets"
+const datasetPath = joinpath(dirname(@__DIR__), folder_name)
+
+        # Download and preprocess data
+        DownloadDatabase.download_data("https://github.com/Omadzze/JlData.git", datasetPath)
+        data, labels = DownloadDatabase.data_preprocessing()
+    
+        # Create test cases using the downloaded data
+        testCases = [
+            testCase(data, labels[1], "Downloaded Data", size(data, 1), size(data, 2), length(unique(labels[1]))),
+        ]
+
+    #include("test_kmeans.jl")
+    #include("test_kmeanspp.jl")
+    #include("test_bkmeans.jl")
 end
