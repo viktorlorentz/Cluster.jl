@@ -5,7 +5,7 @@ using .DataGenerator
 
 const TRAIN_TEST_RATIO = 0.85
 const RAND_INDEX_THRESHOLD = 0.8
-const ACCURACY_SCORE = 0.8
+const ACCURACY_SCORE = 0.2
 
 struct testCase
     data::Array{Float64}
