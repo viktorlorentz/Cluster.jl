@@ -53,21 +53,20 @@ testCases = [
     include("test_bkmeans.jl")
 end
 
+folder_name = "test/datasets"
+datasetPath = joinpath(dirname(@__DIR__), "test/datasets")
+
+# Download and preprocess data
+DownloadDatabase.download_data("https://github.com/Omadzze/JlData.git", datasetPath, "wut", "x3")
+data, labels, dataset = DownloadDatabase.data_preprocessing(datasetPath, "wut", "circles")
+
+# Create test cases using the downloaded data
+testCasesBenchmarking = [
+    testCase(data, labels[1], dataset, size(data, 1), size(data, 2), length(unique(labels[1]))),
+]
+
 @testset "Cluster.jl Benchmarking" begin
-
-
-    folder_name = "test/datasets"
-    datasetPath = joinpath(dirname(@__DIR__), "test/datasets")
-
-    # Download and preprocess data
-    DownloadDatabase.download_data("https://github.com/Omadzze/JlData.git", datasetPath)
-    data, labels = DownloadDatabase.data_preprocessing()
-
-    # Create test cases using the downloaded data
-    testCases = [
-        testCase(data, labels[1], "Downloaded Data", size(data, 1), size(data, 2), length(unique(labels[1]))),
-    ]
-
+    #print(testCasesBenchmarking)
     include("test_kmeans_benchmarking.jl")
     #include("test_kmeanspp.jl")
     #include("test_bkmeans.jl")
