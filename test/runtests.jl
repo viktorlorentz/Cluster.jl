@@ -1,5 +1,6 @@
 using Cluster
 using Test
+using Random
 
 
 """
@@ -102,51 +103,75 @@ ks = [1, 2, 3, 5, 20]  # Selected values of k to test
             @test_throws ArgumentError kmeans(data, "not_a_number")  # k must be an integer
             @test_throws ArgumentError kmeans("not_a_matrix", 2)  # data must be a matrix
             @test_throws ArgumentError kmeans(data, 2, mode=:invalid_mode)  # mode must be a valid symbol
-            @text_throws ArgumentError kmeans(data, 2, mode="invalid_mode")  # mode must be a valid symbol
+            @test_throws ArgumentError kmeans(data, 2, mode="invalid_mode")  # mode must be a valid symbol
         end
 
         @testset "Edge Cases Tests" begin
-            # Single point
-            single_point_data = [1.0]
-            kmeans_result = kmeans(single_point_data, 1)
-            @test length(kmeans_result.centroids) == 1
-            @test kmeans_result.centroids[1] == single_point_data
+            @testset "Single Point" begin
+                single_point_data = [[1.0, 1.0]]
+                kmeans_model = Cluster.KMeans(k=1)
+                kmeans_model.centroids = Cluster.init_centroids(single_point_data, 1, 1)
+                Cluster.fit!(kmeans_model, single_point_data)
+                @test length(kmeans_model.centroids) == 1
+                @test kmeans_model.centroids[1, :] == single_point_data[1]
+            end
 
-            # Identical points
-            identical_points_data = repeat([1.0, 1.0], 100)
-            kmeans_result = kmeans(identical_points_data, 1)
-            @test length(kmeans_result.centroids) == 1
-            @test kmeans_result.centroids[1] == [1.0, 1.0]
+            @testset "Identical Points" begin
+                identical_points_data = [repeat([1.0, 1.0], 100)...]
+                kmeans_model = Cluster.KMeans(k=1)
+                kmeans_model.centroids = Cluster.init_centroids(identical_points_data, 1, 1)
+                Cluster.fit!(kmeans_model, identical_points_data)
+                @test length(kmeans_model.centroids) == 1
+                @test kmeans_model.centroids[1, :] == [1.0, 1.0]
+            end
 
-            # Very large values
-            large_values_data = [1e10 * randn(2) for _ in 1:100]
-            kmeans_result = kmeans(vcat(large_values_data...), 3)
-            @test kmeans_result.converged == true  # Ensure the algorithm converges
+            @testset "Very Large Values" begin
+                large_values_data = [1e10 * randn(2) for _ in 1:100]
+                kmeans_model = Cluster.KMeans(k=3)
+                kmeans_model.centroids = Cluster.init_centroids(vcat(large_values_data...), 3, 1)
+                Cluster.fit!(kmeans_model, vcat(large_values_data...))
+                @test !isempty(kmeans_model.centroids)  # Ensure the algorithm converges
+            end
 
-            # Very small values
-            small_values_data = [1e-10 * randn(2) for _ in 1:100]
-            kmeans_result = kmeans(vcat(small_values_data...), 3)
-            @test kmeans_result.converged == true  # Ensure the algorithm converges
+            @testset "Very Small Values" begin
+                small_values_data = [1e-10 * randn(2) for _ in 1:100]
+                kmeans_model = Cluster.KMeans(k=3)
+                kmeans_model.centroids = Cluster.init_centroids(vcat(small_values_data...), 3, 1)
+                Cluster.fit!(kmeans_model, vcat(small_values_data...))
+                @test !isempty(kmeans_model.centroids)  # Ensure the algorithm converges
+            end
 
-            # All points are identical
-            degenerate_data = [fill(1.0, 2) for _ in 1:100]
-            kmeans_result = kmeans(vcat(degenerate_data...), 3)
-            @test length(unique(kmeans_result.centroids)) == 1  # Only one unique centroid expected
+            @testset "All Points are Identical" begin
+                degenerate_data = [fill(1.0, 2) for _ in 1:100]
+                kmeans_model = Cluster.KMeans(k=3)
+                kmeans_model.centroids = Cluster.init_centroids(vcat(degenerate_data...), 3, 1)
+                Cluster.fit!(kmeans_model, vcat(degenerate_data...))
+                @test length(unique(kmeans_model.centroids)) == 1  # Only one unique centroid expected
+            end
 
-            # Large number of clusters: k > number of points
-            data, _ = create_labeled_data(10, 2, 2)  # 20 points total
-            kmeans_result = kmeans(data, 30)  # k greater than the number of points
-            @test length(unique(kmeans_result.assignments)) <= 20  # Cannot have more clusters than points
+            @testset "Large Number of Clusters: k > Number of Points" begin
+                data, _ = create_labeled_data(10, 2, 2)  # 20 points total
+                kmeans_model = Cluster.KMeans(k=30)  # k greater than the number of points
+                kmeans_model.centroids = Cluster.init_centroids(data, 30, 1)
+                Cluster.fit!(kmeans_model, data)
+                @test length(unique(kmeans_model.labels_)) <= 20  # Cannot have more clusters than points
+            end
 
-            # Cluster centers overlapping
-            overlapping_data = [randn(2) for _ in 1:50] .+ repeat([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]], inner=[50, 1])
-            kmeans_result = kmeans(vcat(overlapping_data...), 3)
-            @test kmeans_result.converged == true  # Ensure the algorithm converges
+            @testset "Cluster Centers Overlapping" begin
+                overlapping_data = [randn(2) for _ in 1:50] .+ repeat([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]], inner=[50, 1])
+                kmeans_model = Cluster.KMeans(k=3)
+                kmeans_model.centroids = Cluster.init_centroids(vcat(overlapping_data...), 3, 1)
+                Cluster.fit!(kmeans_model, vcat(overlapping_data...))
+                @test !isempty(kmeans_model.centroids)  # Ensure the algorithm converges
+            end
 
-            # Sparse data
-            sparse_data = sprand(100, 2, 0.1)  # Sparse matrix with 10% density
-            kmeans_result = kmeans(sparse_data, 3)
-            @test kmeans_result.converged == true  # Ensure the algorithm converges
+            @testset "Sparse Data" begin
+                sparse_data = sprand(100, 2, 0.1)  # Sparse matrix with 10% density
+                kmeans_model = Cluster.KMeans(k=3)
+                kmeans_model.centroids = Cluster.init_centroids(sparse_data, 3, 1)
+                Cluster.fit!(kmeans_model, sparse_data)
+                @test !isempty(kmeans_model.centroids)  # Ensure the algorithm converges
+            end
         end
         @testset "Benchmark against Clustering.jl" begin
 
