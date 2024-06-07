@@ -16,7 +16,7 @@ mutable struct KMeans
 end
 
 # Constructor 
-KMeans(; k::Int=3, mode::Symbol=:kmeans, max_try::Int=1, tol::Float64=1e-4) = KMeans(
+KMeans(; k::Int=3, mode::Symbol=:kmeans, max_try::Int=5, tol::Float64=1e-4) = KMeans(
     k,
     mode,
     max_try,
@@ -32,18 +32,86 @@ function init_centroids(X, K, mode)#; mode::Symbol=:kmeans)
 
     
     println("Initializing centroids...")
-    if mode == 1
-        idx = rand(1:size(X, 1), K)
+    if mode == 1 ## TODO initialize not by numbers but by string or similiar!!
+        row,col = size(X)
+        permutation = randperm(row)#gpt
+        idx = permutation[1:K]
         centroids = X[idx, :]
+
     elseif mode == :kmeans_pp
         # Implement kmeans++ initialization here
         centroids = X # Placeholder for kmeans++ implementation
+
     else
         throw(ArgumentError("Unknown mode: $mode"))
     end
     return centroids
 end
+
+#  fit the model to the data
+function fit!(model::KMeans, X)
+   
+    for i in 1:model.max_try
+
+        D = compute_distance(X, model.centroids,model)
+
+        labels = assign_center(D)
+
+        new_centroids = update_centroids(X,labels,model)
+
+        model.centroids = new_centroids
+        println(model.centroids)
+    end
+        
+end
+
+function compute_distance(X,center,model)
+    #function that gets clustercenters and all data
+    #returns matrix of distance to these clustercenters
+
+    x = size(X)
+    y = size(center)
+
+    D=zeros(x[1],y[1])
+
     
+    for i in 1:model.k
+        D[:,i] = sqrt.(sum((X .- center[i]).^2, dims=2)) #30,1 #gpt
+    end
+   
+    return D
+end
+
+function assign_center(D)
+    #returns minimum argument of the distance matrix
+    
+    return [argmin(D[i, :]) for i in 1:size(D, 1)]#gpt
+end
+
+function update_centroids(X, label_vector,model)
+    #creates a mask based on labels
+    #accesses and calculate new clustercenter with that mask
+
+ 
+    my_list = Vector{Any}()
+    r, c = size(X)
+    
+    my_m = zeros(model.k,c)
+
+    for label in 1:model.k
+        # Create a mask for the current label
+        mask = label_vector .== label
+
+        m = mean(X[mask,:],dims= 1)
+
+        my_m[label,:] = m
+
+    end
+
+    return my_m
+end
+
+
 data_1 = [
     # Cluster 1
     1.0 1.0;
@@ -82,97 +150,26 @@ data_1 = [
     8.6 1.8
 ]
 
-
-
-
-#  fit the model to the data
-function fit!(model::KMeans, X)
-   
-    for i in 1:model.max_try
-        #print("\nim in loop for $i time\n")
-        D = compute_distance(X, model.centroids)
-        labels = assign_center(D)
-        #print("labels size\n:",size(labels))
-        new_centroids = update_centroids(X,labels,model)
-        #new_centroids = convert(Matrix{Float64}, new_centroids)
-        model.centroids = new_centroids
-    end
-        
-end
-
-function compute_distance(X,center)
-    #function that gets clustercenters and all data
-    #returns matrix of distance to these clustercenters
-    #print("im in distancefunction\n")
-
-    x = size(X)
-    y = size(center)
-
-    D=zeros(x[1],y[1])
-
-    
-    for i in 1:3#change to k
-        D[:,i] = sqrt.(sum((X .- center[i]).^2, dims=2)) #30,1 #gpt
-    end
-    #print(size(D))
-   
-    return D
-end
-
-function assign_center(D)
-    #return argmin.(Matrix)
-    #print("assing_center_function\n")
-
-
-    #return argmin(D, dims=2)#-> weird return value
-    return [argmin(D[i, :]) for i in 1:size(D, 1)]#gpt
-end
-
-function update_centroids(X, label_vector,model)
-    # this is what i wanna do
-    # return [mean(X[labels .== i, :], dims=1) for i in 1:k]
-
-    # in this case should return 3,2 vector
-
-    # print(model.centroids)
-    my_list = Vector{Any}()
-    #my_list = Matrix{Float64}()
-
-    for label in 1:model.k
-        # Create a mask for the current label
-        mask = label_vector .== label
-        #print(mask)
-        m = mean(X[mask,:],dims= 1)
-        push!(my_list,m)
-        #average = mean(X[mask])
-
-    end
-
-    print(my_list)
-    return my_list
-end
-
 cent = init_centroids(data_1,3,1)
 
 K = KMeans()
 
 K.centroids = cent
 
-#print("centroids before update functinon",K.centroids)
-
 fit!(K,data_1)
 
-#moduleend
-end
 
-#=
+
 
 
 
 # Predict each point in X belongs to cluster
 function predict(model::KMeans, X)
+    #
+    D = compute_distance(X, model.centroids,model)
+
+    return assign_center(D)
 end
 
-end
 
-=#
+end
