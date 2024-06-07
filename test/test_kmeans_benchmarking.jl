@@ -62,7 +62,7 @@ using .Plotting
                         # if accuracy above value then our test was passed
                         @test accuracy >= ACCURACY_SCORE
                         
-                        @test ri > RAND_INDEX_THRESHOLD
+                        @test ri > RAND_INDEX_THRESHOLD_BENCHMARKING
                         # visualize all predictions
                         Plotting.visualize_clusters(test_data, test_labels, test_pred_labels, dataset_name)
                     else # single point
