@@ -5,16 +5,8 @@ using .Utils
 include("Plotting.jl")
 using .Plotting
 
-#TODO
-# rand_index
-# what ration of data is correct
-# some metrics to test benchmarking
-# time
-# we need to compare cluster.jl with out algorithm and check the time and accuracy
-
 @testset "K-means Benchmarking" begin
     @testset "K-means Basic Functionality Benchmarking" begin
-
         for testCase in testCasesBenchmarking
             @testset "Test Case: $(testCase.name)" begin
 
@@ -57,14 +49,11 @@ using .Plotting
                         ri = randindex(test_labels, remap_pred_labels)
                         println("Test Case: $(testCase.name), Rand Index: $ri")
 
-                        #println("Predicted labels")
-                        #println(remap_pred_labels)
-                        #println("Test Labels")
-                        #println(test_labels)
                         accuracy = sum(remap_pred_labels .== test_labels) / length(test_labels)
                         println("Test Case: $(testCase.name), Accuracy: $accuracy")
+
+                        @test accuracy >= 0.8
                         
-                        #print("Rand Index: " + ri)
                         @test ri > RAND_INDEX_THRESHOLD
                         Plotting.visualize_clusters(test_data, test_labels, test_pred_labels, dataset_name)
                     else # single point

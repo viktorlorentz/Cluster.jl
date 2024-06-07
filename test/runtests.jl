@@ -46,28 +46,38 @@ testCases = [
     #testCase(10000, 20, 10, "Very large dataset")
 ]
 
-
 @testset "Cluster.jl Tests" begin
     include("test_kmeans.jl")
     include("test_kmeanspp.jl")
     include("test_bkmeans.jl")
 end
 
-folder_name = "test/datasets"
-datasetPath = joinpath(dirname(@__DIR__), "test/datasets")
 
-# Download and preprocess data
-DownloadDatabase.download_data("https://github.com/Omadzze/JlData.git", datasetPath, "wut", "x3")
-data, labels, dataset = DownloadDatabase.data_preprocessing(datasetPath, "wut", "circles")
+function test_benchmark()
 
-# Create test cases using the downloaded data
-testCasesBenchmarking = [
-    testCase(data, labels[1], dataset, size(data, 1), size(data, 2), length(unique(labels[1]))),
-]
+    datasetPath = joinpath(dirname(@__DIR__), "test/datasets")
+
+    batteries = [
+        "circles", "cross", "graph", "isolation", "labirynth", 
+        "mk1", "mk2", "mk3", "mk4", "olympic", "smile", "stripes",
+        "trajectories", "trapped_lovers", "twosplashes", "windows",
+        "x1", "x2", "x3", "z1", "z2", "z3"
+    ]
+
+    global testCasesBenchmarking = []
+
+    for battery in batteries
+        DownloadDatabase.download_data("https://github.com/Omadzze/JlData.git", datasetPath, "wut", battery)
+        data, labels = DownloadDatabase.data_preprocessing(datasetPath, "wut", battery)
+
+        # Create test cases using the downloaded data
+        push!(testCasesBenchmarking, testCase(data, labels[1], battery, size(data, 1), size(data, 2), length(unique(labels[1]))))
+    end
+
+end
+
+test_benchmark()
 
 @testset "Cluster.jl Benchmarking" begin
-    #print(testCasesBenchmarking)
     include("test_kmeans_benchmarking.jl")
-    #include("test_kmeanspp.jl")
-    #include("test_bkmeans.jl")
 end

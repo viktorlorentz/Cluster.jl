@@ -31,7 +31,7 @@ function download_data(url, datasetPath, battery, dataset)
         LibGit2.clone(url, datasetPath)
     # start processing if data exist
     else
-        print("Data exist. Preprocessing... \n")
+        #print("Data exist. Preprocessing... \n")
         data_preprocessing(datasetPath, battery, dataset)
     end
 end
