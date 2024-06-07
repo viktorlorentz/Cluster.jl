@@ -111,7 +111,7 @@ function compute_distance(X,center)
     D=zeros(x[1],y[1])
 
     
-    for i in 1:3
+    for i in 1:3#change to k
         D[:,i] = sqrt.(sum((X .- center[i]).^2, dims=2)) #30,1 #gpt
     end
     #print(size(D))
