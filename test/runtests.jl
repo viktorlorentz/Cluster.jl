@@ -1,7 +1,6 @@
 using Test
 include("DataGenerator.jl")
 include("DownloadDatabase.jl")
-include("../src/Cluster.jl")
 using .DataGenerator
 
 const TRAIN_TEST_RATIO = 0.85
@@ -26,7 +25,7 @@ struct testCase
 end
 
 testCases = [
-           # 50 samples, 2 features, 3 classes
+    # 50 samples, 2 features, 3 classes
     testCase(50, 2, 3, "Basic functionality"),
     testCase(50, 3, 2, "3D data"),
     testCase(50, 2, 5, "More clusters than dimensions"),
@@ -56,20 +55,20 @@ end
 
 @testset "Cluster.jl Benchmarking" begin
 
-    
-folder_name = "test/datasets"
-const datasetPath = joinpath(dirname(@__DIR__), folder_name)
 
-        # Download and preprocess data
-        DownloadDatabase.download_data("https://github.com/Omadzze/JlData.git", datasetPath)
-        data, labels = DownloadDatabase.data_preprocessing()
-    
-        # Create test cases using the downloaded data
-        testCases = [
-            testCase(data, labels[1], "Downloaded Data", size(data, 1), size(data, 2), length(unique(labels[1]))),
-        ]
+    folder_name = "test/datasets"
+    datasetPath = joinpath(dirname(@__DIR__), "test/datasets")
 
-    #include("test_kmeans.jl")
+    # Download and preprocess data
+    DownloadDatabase.download_data("https://github.com/Omadzze/JlData.git", datasetPath)
+    data, labels = DownloadDatabase.data_preprocessing()
+
+    # Create test cases using the downloaded data
+    testCases = [
+        testCase(data, labels[1], "Downloaded Data", size(data, 1), size(data, 2), length(unique(labels[1]))),
+    ]
+
+    include("test_kmeans_benchmarking.jl")
     #include("test_kmeanspp.jl")
     #include("test_bkmeans.jl")
 end
