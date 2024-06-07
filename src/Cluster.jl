@@ -5,16 +5,16 @@ using Random
 # using Statistics
 
 # Initialize centroids  kmeans++ or nor mal kmeans
-function init_centroids(X, K; mode::Symbol=:kmeans)
+function init_centroids(X, K; mode::String="kmeans")
 
     centroids = zeros(K, size(X))
 
-    if mode == :kmeans
-        centroids = x   #TODO assign the centroids
-    elseif mode == :kmeans++
+    if mode == "kmeans"
+        centroids = X   #TODO assign the centroids
+    elseif mode == "kmeans++"
         centroids = X    #TODO assign the centroids
-    # else
-    #     throw(ArgumentError(" wrong mode."))
+    else
+        throw(ArgumentError("Mode does not exist."))
 
     end
 
@@ -30,17 +30,17 @@ mutable struct KMeans
     tol::Float64
     centroids::Array{Float64, 2}
     labels_::Array{Int, 1}
-   
+
 end
 
-# Constructor 
+# Constructor
 KMeans(; k::Int=3, mode::Symbol=:kmeans, max_try::Int=200, tol::Float64=1e-4) = KMeans(
-   
+
 )
 #  fit the model to the data
 function fit!(model::KMeans, X)
 
-end 
+end
 
 
 # Predict each point in X belongs to cluster
