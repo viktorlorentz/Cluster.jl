@@ -5,6 +5,7 @@ using .DataGenerator
 
 const TRAIN_TEST_RATIO = 0.85
 const RAND_INDEX_THRESHOLD = 0.8
+const ACCURACY_SCORE = 0.8
 
 struct testCase
     data::Array{Float64}
@@ -55,6 +56,13 @@ end
 
 function test_benchmark()
 
+    """
+    Function which runs our benchmarking algorithm on a dataset.
+    We have different batteries that will be running from a "wut" dataset.
+    """
+
+    global testCasesBenchmarking = []
+
     datasetPath = joinpath(dirname(@__DIR__), "test/datasets")
 
     batteries = [
@@ -63,8 +71,6 @@ function test_benchmark()
         "trajectories", "trapped_lovers", "twosplashes", "windows",
         "x1", "x2", "x3", "z1", "z2", "z3"
     ]
-
-    global testCasesBenchmarking = []
 
     for battery in batteries
         DownloadDatabase.download_data("https://github.com/Omadzze/JlData.git", datasetPath, "wut", battery)

@@ -7,6 +7,12 @@ using .Plotting
 
 @testset "K-means Benchmarking" begin
     @testset "K-means Basic Functionality Benchmarking" begin
+
+        """
+        Test for benchmarking K-means algorithm. Calucalates Rand index whether it's above certain threshold.
+        Moreover, it calculates accuracy score and if it's above 80% returns pass to the test
+        """
+
         for testCase in testCasesBenchmarking
             @testset "Test Case: $(testCase.name)" begin
 
@@ -49,12 +55,15 @@ using .Plotting
                         ri = randindex(test_labels, remap_pred_labels)
                         println("Test Case: $(testCase.name), Rand Index: $ri")
 
+                        # Calculate accuracy
                         accuracy = sum(remap_pred_labels .== test_labels) / length(test_labels)
                         println("Test Case: $(testCase.name), Accuracy: $accuracy")
 
-                        @test accuracy >= 0.8
+                        # if accuracy above value then our test was passed
+                        @test accuracy >= ACCURACY_SCORE
                         
                         @test ri > RAND_INDEX_THRESHOLD
+                        # visualize all predictions
                         Plotting.visualize_clusters(test_data, test_labels, test_pred_labels, dataset_name)
                     else # single point
                         @test predict(model, test_data) == [1]
@@ -63,5 +72,4 @@ using .Plotting
             end
         end
     end
-
 end
