@@ -23,7 +23,7 @@ KMeans(; k::Int=3, mode::Symbol=:kmeans, max_try::Int=5, tol::Float64=1e-4) = KM
     tol,
     zeros(Float64, 0, 0),  # Initialize centroids as an empty 2D array
     Int[]                  # Initialize labels_ as an empty 1D array
-    #chatgpt
+    
 )
 
 
@@ -58,7 +58,11 @@ function fit!(model::KMeans, X)
         labels = assign_center(D)
 
         new_centroids = update_centroids(X,labels,model)
-
+         
+        if maximum(sqrt.(sum((model.centroids .- new_centroids).^2, dims=2))) < model.tol
+            break
+        end
+        
         model.centroids = new_centroids
         println(model.centroids)
     end
