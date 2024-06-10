@@ -87,6 +87,7 @@ function init_centroids(X, K, mode)
         throw(ArgumentError("Unknown mode: $mode"))
     end
 
+
     return centroids
 end
 
@@ -111,8 +112,8 @@ function fit!(model::KMeans, X)
         if maximum(sqrt.(sum((model.centroids .- new_centroids).^2, dims=2))) < model.tol
             break
         end
-        
         model.centroids = new_centroids
+    
     
     end
         
@@ -140,7 +141,6 @@ function compute_distance(X,centroids)
             D[j,i] = sqrt(sum((X[j, :] .- centroids[i, :]).^2))
         end
     end
-   
     return D
 end
 
