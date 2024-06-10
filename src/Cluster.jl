@@ -68,14 +68,15 @@ end
 
 #  fit the model to the data
 function fit!(model::KMeans, X)
-   
+    model.centroids = init_centroids(data_1,3, K, "kmeans" )
     for i in 1:model.max_try
-
+        println(model.centroids)
         D = compute_distance(X, model.centroids,model)
         println(D)
         labels = assign_center(D)
-        new_centroids = update_centroids(X,labels,model)  
         println(labels)
+
+        new_centroids = update_centroids(X,labels,model)  
         model.labels_ = labels
 
         if maximum(sqrt.(sum((model.centroids .- new_centroids).^2, dims=2))) < model.tol
@@ -93,10 +94,10 @@ function compute_distance(X,center,model)
 
     x = size(X)
     y = size(center)
-    D=zeros(x[1],y[1])
+    D=zeros(Float64,x[1],y[1])
     for i in 1:y[1]
         for j in 1:x[1]
-            D[j,i] = sum((X[j, :] .- center[i, :]).^2)
+            D[j,i] = norm((X[j, :] .- center[i, :]))
         end
     end
     return D
@@ -122,7 +123,6 @@ function update_centroids(X, label_vector,model)
     return my_m
 end
 
-# Predict each point in X belongs to cluster
 function predict(model::KMeans, X)
     #
     D = compute_distance(X, model.centroids,model)
@@ -169,10 +169,6 @@ data_1 = [
 ]
 
 K = KMeans()
-
-cent = init_centroids(data_1,3, K, "kmeans" )
-
-K.centroids = cent
 
 fit!(K,data_1)
 
