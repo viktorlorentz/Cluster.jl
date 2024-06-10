@@ -28,9 +28,25 @@ KMeans(; k::Int=3, mode::Symbol=:kmeans, max_try::Int=100, tol::Float64=1e-4) = 
 function init_centroids(X, K, mode)
     """
 
-        centroids = init_centroids(data_1, numberofcluster, mode)
+        centroids = init_centroids(data, numberofcluster, mode)
 
     Initialize Controids for chosen algorithm.
+
+    currently available modes are kmeans and kmeans++
+    
+    example:
+    
+    X = [
+    1.0 1.0;
+    1.5 2.0;
+    3.0 4.0;
+    5.0 6.0;
+    8.0 9.0;
+    10.0 11.0]
+
+    K = 2
+
+    mode = :kmeans
     
     """
 
@@ -41,14 +57,11 @@ function init_centroids(X, K, mode)
         idx = permutation[1:K]
         centroids = X[idx, :]
         
-
     elseif mode == 2
         # kmeans++ initialization 
-        
         row,col = size(X)
         permutation = randperm(row)
         idx = permutation[1:K]
-        print("idx",idx)
         centroids = X[idx, :]
 
         for k in 2:K
@@ -84,7 +97,7 @@ function fit!(model::KMeans, X)
         fit!(Model,data)
 
     Runs KMeans algorithm for given Data and Model
-
+    
     """
     
     for i in 1:model.max_try
@@ -113,7 +126,7 @@ function compute_distance(X,centroids)
 
     Computes the distance from each Datapoint to each centroid and the Distances in a Matrix
 
-    returns a Matrix D size(length(datavector), number of centroids)
+    return a Matrix D size(length(datavector), number of centroids)
 
     """
 
@@ -134,7 +147,6 @@ end
 
 function assign_center(D)
     """
-
         assign_center(D)
 
     Returns the Minimum Argument of given Distance Matrix for every Datapoint. 
@@ -175,8 +187,41 @@ function predict(model::KMeans, X)
     """
         predict(model,data)
 
-    predicts cluster for given Datapoint
+    return cluster for given Datapoint
+    
+    # Examples
+    ```julia-repl
+    
+    data_1 = [
+    # Cluster 1
+    1.0 1.0 1.5;
+    1.5 2.0 1.6;
+    1.3 1.8 1.4;
 
+    
+    # Cluster 2
+    5.0 7.0 3.5;
+    5.5 7.5 3.5;
+    6.0 7.0 3.5;
+
+    
+    # Cluster 3
+    8.0 1.0 6.5;
+    8.5 1.5 6.5;
+    8.3 1.2 7.5;
+    ]
+
+    test_data = [
+        1.1 1.1 1.2
+    ]
+
+    model = Kmeans()
+
+    fit!(model,data)
+
+    julia> predict(model,test_data)
+    [1]
+    ```    
     """
     
     D = compute_distance(X, model.centroids)
