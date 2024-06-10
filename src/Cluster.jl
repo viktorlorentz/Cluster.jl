@@ -23,15 +23,12 @@ KMeans(; k::Int=3, mode::Symbol=:kmeans, max_try::Int=5, tol::Float64=1e-4) = KM
     tol,
     zeros(Float64, 0, 0),  # Initialize centroids as an empty 2D array
     Int[]                  # Initialize labels_ as an empty 1D array
-    
 )
 
 
 # Initialize centroids  kmeans++ or normal kmeans
-function init_centroids(X, K, mode)#; mode::Symbol=:kmeans)
+function init_centroids(X, K, mode)
 
-    
-    println("Initializing centroids...")
     if mode == 1 ## TODO initialize not by numbers but by string or similiar!!
         row,col = size(X)
         permutation = randperm(row)#gpt
@@ -54,10 +51,9 @@ function fit!(model::KMeans, X)
     for i in 1:model.max_try
 
         D = compute_distance(X, model.centroids,model)
-        # println(model.centroids)
-        # println(D)
+
         labels = assign_center(D)
-        println(labels)
+
         new_centroids = update_centroids(X,labels,model)
          
         if maximum(sqrt.(sum((model.centroids .- new_centroids).^2, dims=2))) < model.tol
@@ -79,7 +75,6 @@ function compute_distance(X,center,model)
 
     D=zeros(x[1],y[1])
 
-    
     for i in 1:y[1]
         for j in 1:x[1]
             D[j,i] = sqrt(sum((X[j, :] .- center[i, :]).^2))
@@ -91,14 +86,12 @@ end
 
 function assign_center(D)
     #returns minimum argument of the distance matrix
-    
     return [argmin(D[i, :]) for i in 1:size(D, 1)]#gpt
 end
 
 function update_centroids(X, label_vector,model)
     #creates a mask based on labels
     #accesses and calculate new clustercenter with that mask
-
  
     my_list = Vector{Any}()
     r, c = size(X)
@@ -165,14 +158,9 @@ K.centroids = cent
 
 fit!(K,data_1)
 
-
-
-println(K.labels_)
-
-
 # Predict each point in X belongs to cluster
 function predict(model::KMeans, X)
-    #
+    
     D = compute_distance(X, model.centroids,model)
 
     return assign_center(D)
