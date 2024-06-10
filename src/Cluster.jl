@@ -1,6 +1,5 @@
 module Cluster
 
-# Write your package code here.
 using Random
 using LinearAlgebra #norm
 using Statistics #mean
@@ -28,18 +27,17 @@ KMeans(; k::Int=3, mode::Symbol=:kmeans, max_try::Int=5, tol::Float64=1e-4) = KM
 
 
 # Initialize centroids  kmeans++ or normal kmeans
-function init_centroids(X, K, mode,model)#; mode::Symbol=:kmeans)
+function init_centroids(X, K,model, mode)#; mode::Symbol=:kmeans)
 
     
     println("Initializing centroids...")
-    if mode == 1 ## TODO initialize not by numbers but by string or similiar!!
+    if mode == "kmeans"
         row,col = size(X)
         permutation = randperm(row)#gpt
         idx = permutation[1:K]
         centroids = X[idx, :]
 
-    elseif mode == 2
-        # Implement kmeans++ initialization here
+    elseif mode == "kmeanspp"
         
         row,col = size(X)
         permutation = randperm(row)#gpt
@@ -49,25 +47,22 @@ function init_centroids(X, K, mode,model)#; mode::Symbol=:kmeans)
         for k in 2:K
         # dist from data points to  centroids
             D = compute_distance(X, centroids[1:k-1, :],model)
-            println(D)
         # assign each  data point to  it's nearest centroids
             Dm = minimum(D, dims=2)
-            println(Dm)
-            
-        # Choose the next centroid 
+        # calcualte probabilities 
             probabilities = vec(Dm) / sum(Dm)
-            println(probabilities)
             cummulative_probabilities = cumsum(probabilities)
-            println(cummulative_probabilities)
         # perform  weighted random selection.
             r_num = rand()
             next_centroid_ind = searchsortedfirst(cummulative_probabilities, r_num)
-            
-            centroids[k, :] = X[next_centroid_ind, :]        end 
+        # choose the next centroid
+            centroids[k, :] = X[next_centroid_ind, :]       
+        end 
 
     else
         throw(ArgumentError("Unknown mode: $mode"))
     end
+
     return centroids
 end
 
@@ -77,18 +72,17 @@ function fit!(model::KMeans, X)
     for i in 1:model.max_try
 
         D = compute_distance(X, model.centroids,model)
-        # println(model.centroids)
-        # println(D)
+        println(D)
         labels = assign_center(D)
+        new_centroids = update_centroids(X,labels,model)  
         println(labels)
-        new_centroids = update_centroids(X,labels,model)
-         
+        model.labels_ = labels
+
         if maximum(sqrt.(sum((model.centroids .- new_centroids).^2, dims=2))) < model.tol
             break
         end
-        
         model.centroids = new_centroids
-        
+    
     end
         
 end
@@ -99,56 +93,50 @@ function compute_distance(X,center,model)
 
     x = size(X)
     y = size(center)
-
     D=zeros(x[1],y[1])
-
-    
     for i in 1:y[1]
         for j in 1:x[1]
-            D[j,i] = sqrt(sum((X[j, :] .- center[i, :]).^2))
+            D[j,i] = sum((X[j, :] .- center[i, :]).^2)
         end
     end
-   
     return D
 end
 
 function assign_center(D)
     #returns minimum argument of the distance matrix
-    
     return [argmin(D[i, :]) for i in 1:size(D, 1)]#gpt
 end
 
 function update_centroids(X, label_vector,model)
     #creates a mask based on labels
     #accesses and calculate new clustercenter with that mask
-
- 
     my_list = Vector{Any}()
     r, c = size(X)
-    
     my_m = zeros(model.k,c)
-
     for label in 1:model.k
         # Create a mask for the current label
         mask = label_vector .== label
-
         m = mean(X[mask,:],dims= 1)
-
         my_m[label,:] = m
-
     end
-
     return my_m
 end
 
+# Predict each point in X belongs to cluster
+function predict(model::KMeans, X)
+    #
+    D = compute_distance(X, model.centroids,model)
+
+    return assign_center(D)
+end
 
 data_1 = [
     # Cluster 1
     1.0 1.0;
     1.5 2.0;
-    # 1.3 1.8;
-    # 1.2 1.2;
-    # 0.8 0.9;
+    1.3 1.8;
+    1.2 1.2;
+    0.8 0.9;
     # 1.0 1.1;
     # 1.3 1.3;
     # 1.2 1.3;
@@ -158,9 +146,9 @@ data_1 = [
     # Cluster 2
     5.0 7.0;
     5.5 7.5;
-    # 6.0 7.0;
-    # 5.8 7.2;
-    # 6.2 7.5;
+    6.0 7.0;
+    5.8 7.2;
+    6.2 7.5;
     # 5.9 6.8;
     # 5.6 7.1;
     # 6.3 7.6;
@@ -170,9 +158,9 @@ data_1 = [
     # Cluster 3
     8.0 1.0;
     8.5 1.5;
-    # 8.3 1.2;
-    # 8.7 1.8;
-    # 8.4 1.4;
+    8.3 1.2;
+    8.7 1.8;
+    8.4 1.4;
     # 8.1 1.1;
     # 8.6 1.6;
     # 8.4 1.3;
@@ -182,7 +170,7 @@ data_1 = [
 
 K = KMeans()
 
-cent = init_centroids(data_1,3,2,K)
+cent = init_centroids(data_1,3, K, "kmeans" )
 
 K.centroids = cent
 
@@ -193,13 +181,6 @@ fit!(K,data_1)
 println(K.labels_)
 
 
-# Predict each point in X belongs to cluster
-function predict(model::KMeans, X)
-    #
-    D = compute_distance(X, model.centroids,model)
-
-    return assign_center(D)
-end
 
 
 end
