@@ -5,3 +5,6 @@
 /docs/Manifest.toml
 /docs/build/
 .DS_Store
+
+test/datasets
+test/datasets_test
