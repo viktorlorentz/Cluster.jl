@@ -1,0 +1,13 @@
+name = "Cluster"
+uuid = "a199801d-da2f-495f-981e-bf842e0b3fa3"
+authors = ["Mohamad Bassel Fatloun<fatloun@campus.tu-berlin.de>", "Viktor Lorentz<lorentz@campus.tu-berlin.de>", "Florentin Marquardt<marquardt@campus.tu-berlin.de>", "Omadbek Meliev<meliev@campus.tu-berlin.de>"]
+version = "0.0.0"
+
+[deps]
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
+
+[compat]
+Random = "1"
+julia = "1.10"
