@@ -11,10 +11,10 @@ mutable struct KMeans
     max_try::Int
     tol::Float64
     centroids::Array{Float64, 2}
-    labels_::Array{Int, 1}
+    labels::Array{Int, 1}
 end
 
-# Constructor 
+# Constructor
 KMeans(; k::Int=3, mode::Symbol=:kmeans, max_try::Int=100, tol::Float64=1e-4) = KMeans(
     k,
     mode,
@@ -33,9 +33,9 @@ function init_centroids(X, K, mode)
     Initialize Controids for chosen algorithm.
 
     currently available modes are kmeans and kmeans++
-    
+
     example:
-    
+
     X = [
     1.0 1.0;
     1.5 2.0;
@@ -47,7 +47,7 @@ function init_centroids(X, K, mode)
     K = 2
 
     mode = :kmeans
-    
+
     """
 
     if mode == 1
@@ -56,9 +56,9 @@ function init_centroids(X, K, mode)
         permutation = randperm(row)
         idx = permutation[1:K]
         centroids = X[idx, :]
-        
+
     elseif mode == 2
-        # kmeans++ initialization 
+        # kmeans++ initialization
         row,col = size(X)
         permutation = randperm(row)
         idx = permutation[1:K]
@@ -70,18 +70,18 @@ function init_centroids(X, K, mode)
 
         # assign each  data point to  it's nearest centroids
             Dm = minimum(D, dims=2)
-            
-        # Choose the next centroid 
+
+        # Choose the next centroid
             probabilities = vec(Dm) / sum(Dm)
 
             cummulative_probabilities = cumsum(probabilities)
- 
+
         # perform  weighted random selection.
             r_num = rand()
             next_centroid_ind = searchsortedfirst(cummulative_probabilities, r_num)
-            
-            centroids[k, :] = X[next_centroid_ind, :]        
-        end 
+
+            centroids[k, :] = X[next_centroid_ind, :]
+        end
 
     else
         throw(ArgumentError("Unknown mode: $mode"))
@@ -98,25 +98,25 @@ function fit!(model::KMeans, X)
         fit!(Model,data)
 
     Runs KMeans algorithm for given Data and Model
-    
+
     """
-    
+
     for i in 1:model.max_try
-        
+
         D = compute_distance(X, model.centroids)
 
         labels = assign_center(D)
-        
+
         new_centroids = update_centroids(X,labels,model)
-        
+
         if maximum(sqrt.(sum((model.centroids .- new_centroids).^2, dims=2))) < model.tol
             break
         end
         model.centroids = new_centroids
-    
-    
+
+
     end
-        
+
 end
 
 
@@ -149,7 +149,7 @@ function assign_center(D)
     """
         assign_center(D)
 
-    Returns the Minimum Argument of given Distance Matrix for every Datapoint. 
+    Returns the Minimum Argument of given Distance Matrix for every Datapoint.
 
     """
     return [argmin(D[i, :]) for i in 1:size(D, 1)]
@@ -167,16 +167,16 @@ function update_centroids(X, label_vector, model)
 
     my_list = Vector{Any}()
     r, c = size(X)
-    
+
     centroids = zeros(model.k,c)
 
     for label in 1:model.k
         # Create a mask for the current label
         mask = label_vector .== label
 
-        # average the values using the mask 
+        # average the values using the mask
         centroids[label,:] = mean(X[mask,:],dims= 1)
-        
+
     end
 
     return centroids
@@ -188,23 +188,23 @@ function predict(model::KMeans, X)
         predict(model,data)
 
     return cluster for given Datapoint
-    
+
     # Examples
     ```julia-repl
-    
+
     data_1 = [
     # Cluster 1
     1.0 1.0 1.5;
     1.5 2.0 1.6;
     1.3 1.8 1.4;
 
-    
+
     # Cluster 2
     5.0 7.0 3.5;
     5.5 7.5 3.5;
     6.0 7.0 3.5;
 
-    
+
     # Cluster 3
     8.0 1.0 6.5;
     8.5 1.5 6.5;
@@ -221,9 +221,9 @@ function predict(model::KMeans, X)
 
     julia> predict(model,test_data)
     [1]
-    ```    
+    ```
     """
-    
+
     D = compute_distance(X, model.centroids)
 
     return assign_center(D)
