@@ -5,66 +5,86 @@ using Clustering
 using Statistics
 
 folder_name = "datasets"
-const datasetpath = joinpath(dirname(@__DIR__), folder_name)
+const datasetPath = joinpath(dirname(@__DIR__), folder_name)
 
-# Downloading dataset to test our algorithm from Github
+
 function download_data(url, datasetPath)
+    """
+    Downloads benchmarking data from Github repository
+
+    Args:
+        url (string): Url to download benchmark data
+        datasetPath (string): Path to store downloaded data
+
+    Returns:
+        It should download data and start data_preprocessing() function
+    """
+    # if there is no folder, create it and download data
     if !isdir(datasetPath)
         mkdir(datasetPath)
         LibGit2.clone(url, datasetPath)
         print("Creating folder and downloading data... \n")
+    # else if folder exist but it's empty, download data
     elseif isdir(datasetPath) && isempty(readdir(datasetPath))
         print("Downloading data... \n")
         LibGit2.clone(url, datasetPath)
+    # start processing if data exist
     else
         print("Data exist. Preprocessing... \n")
         data_preprocessing()
     end
 end
 
-# code taken from https://github.com/HolyLab/ClusteringBenchmarks.jl 
-# Preprocess our data after downloading. Note that data are in .data.gz
-# format so we need to extract it
-function data_preprocessing()
-    battery = "wut"
-    dataset = "x2"
 
-    basename = joinpath(datasetpath, battery, dataset)
-    datafile = basename * ".data.gz"
-    #print(datafile)
-    isfile(datafile) || error("no such file: $datafile")
-    data = Matrix(gzopen(datafile) do f
-        readdlm(f, Float64)'
+function data_preprocessing(dataset_path=datasetPath, battery="wut", dataset="x2")
+    """
+    Preprocess data and labels from Gzip compressed files
+
+    Args:
+        dataset_path (String): Path to the dataset
+        battery (String, optional): Dataset name directory
+        dataset (String, optional): Name of the dataset files
+
+    Returns:
+        Tuple{Matrix{Float64}, Vector{Vector{Int}}}: 
+            Return a matrix with columns as features and rows as datapoints
+    """
+    
+    full_path = joinpath(dataset_path, battery, dataset)
+    data_file = full_path * ".data.gz"
+
+    # Check whether dataset exist
+    if !isfile(data_file)
+        error("Data file not found: $data_file")
+    end
+
+    data = Matrix(gzopen(data_file) do f
+        readdlm(f, Float64)
     end)
-    labels = Vector{Int}[]
+
+    # load labels files
+    labels = Vector{Vector{Int}}()
     i = 0
     while true
-        labelfile = basename * ".labels$i.gz"
-        if !isfile(labelfile)
+        label_file = full_path * ".labels$i.gz"
+        if !isfile(label_file)
             break
         end
-        push!(labels, gzopen(labelfile) do f
+
+        push!(labels, gzopen(label_file) do f
             vec(readdlm(f, Int))
         end)
         i += 1
     end
-    isempty(labels) && error("no label files found for $basename")
+
+    # Check whether we have labels for the dataset
+    if isempty(labels)
+        error("No label files found for dataset: $dataset")
+    end
+
     return data, labels
 end
 
-# make calculation on data that was downloaded
-function data_calculation(data; noise_factor=1e-6)
-    mean = Statistics.mean(data, dims=2)
-    centroid = data .- mean
-    std_dev = Statistics.std(centroid, dims=2)
-    scaled = centroid ./ std_dev
-    noise = noise_factor * randn(size(data))
-    return scaled .+ noise
-end
 
-
-download_data("https://github.com/Omadzze/JlData.git", datasetpath)
-
+download_data("https://github.com/Omadzze/JlData.git", datasetPath)
 data, lables = data_preprocessing()
-calculated_data = data_calculation(data)
-print(calculated_data)
