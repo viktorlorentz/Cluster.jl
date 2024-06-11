@@ -1,10 +1,10 @@
 #using Cluster
 using Test
 #using FileIO
-include("../src/DownloadDatabase.jl")
+include("../test/DownloadDatabase.jl")
 
 url = "https://github.com/Omadzze/JlData.git"
-folder_name_test = "datasets_test"
+folder_name_test = "test/datasets_test"
 const datasetpathTest = joinpath(dirname(@__DIR__), folder_name_test)
 
 @testset "download_data tests" begin
@@ -16,5 +16,5 @@ const datasetpathTest = joinpath(dirname(@__DIR__), folder_name_test)
     @test !isdir(datasetpathTest) # Directory not exist
     download_data(url, datasetpathTest)
     @test isdir(datasetpathTest) # Directory exist
-    @test !isempty(readdir(datasetpathTest)) # Checks whether we have data inside directory    
+    @test !isempty(readdir(datasetpathTest)) # Checks whether we have data inside directory
 end

@@ -1,10 +1,9 @@
 using LibGit2
 using GZip
 using DelimitedFiles
-using Clustering
 using Statistics
 
-folder_name = "datasets"
+folder_name = "test/datasets"
 const datasetPath = joinpath(dirname(@__DIR__), folder_name)
 
 
@@ -46,10 +45,10 @@ function data_preprocessing(dataset_path=datasetPath, battery="wut", dataset="x2
         dataset (String, optional): Name of the dataset files
 
     Returns:
-        Tuple{Matrix{Float64}, Vector{Vector{Int}}}: 
+        Tuple{Matrix{Float64}, Vector{Vector{Int}}}:
             Return a matrix with columns as features and rows as datapoints
     """
-    
+
     full_path = joinpath(dataset_path, battery, dataset)
     data_file = full_path * ".data.gz"
 
@@ -86,5 +85,5 @@ function data_preprocessing(dataset_path=datasetPath, battery="wut", dataset="x2
 end
 
 
-download_data("https://github.com/Omadzze/JlData.git", datasetPath)
-data, lables = data_preprocessing()
+# download_data("https://github.com/Omadzze/JlData.git", datasetPath)
+# data, lables = data_preprocessing()
