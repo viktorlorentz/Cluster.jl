@@ -152,15 +152,16 @@ function fit!(model::KMeans, X)
         println(model.centroids)
         D = compute_distance(X, model.centroids)
         println(D)
-        labels = assign_center(D)
-        println(labels)
-        new_centroids = update_centroids(X, labels, model)
+        model.labels = assign_center(D)
+        println(model.labels)
+        new_centroids = update_centroids(X, model.labels, model)
 
         for j in 1:model.k
-            if !(j in labels)
+            if !(j in model.labels)
                 new_centroids[j, :] = X[rand(1:size(X, 1)), :]
             end
         end
+
         if maximum(sqrt.(sum((model.centroids .- new_centroids) .^ 2, dims=2))) < model.tol
             break
         end
@@ -328,8 +329,8 @@ data = [
 ]
 test_data = [1.1 1.1 1.2]
 model = KMeans(mode="kmeans")
-fit!(model, data)
-#
+# fit!(model, data)
+
 function predict(model::KMeans, X)
 
 
@@ -337,4 +338,52 @@ function predict(model::KMeans, X)
     return assign_center(D)
 end
 
+mutable struct BKMeans
+    k::Int
+    kmeans::KMeans
+    labels::Array{Int,1}
+end
+
+BKMeans(; k::Int=3, kmeans::KMeans=KMeans(k=2, mode="kmeans")) = BKMeans(
+    k,
+    kmeans,
+    Int[]
+)
+
+function fit!(model::BKMeans, X)
+    clusters = [X]
+
+    while length(clusters) < model.k
+        println(clusters)
+        sse = [sum(compute_distance(clusters[i], mean(clusters[i], dims=1)) .^ 2) for i in 1:length(clusters)]
+        i = argmax(sse)
+        println(sse)
+        sub_model = deepcopy(model.kmeans)
+        fit!(sub_model, clusters[i])
+        println(clusters[i])
+
+        
+        new_clusters = [clusters[i][sub_model.labels .== 1, :], clusters[i][sub_model.labels .== 2, :]] 
+
+        deleteat!(clusters, i)
+        # println(clusters)
+        for new_cluster in new_clusters
+            push!(clusters, new_cluster)
+        end
+        # println(clusters)
+        # println("safe222222222222")
+     
+    end
+    model.labels= []
+    for g1 in 1:length(clusters)
+        rows,_ = size(clusters[g1])
+        for g2 in 1:rows
+            push!(model.labels, g1)
+        end
+    end
+    # println(model.labels)
+end
+
+model = BKMeans()
+fit!(model, data)
 end
