@@ -156,6 +156,11 @@ function fit!(model::KMeans, X)
         println(labels)
         new_centroids = update_centroids(X, labels, model)
 
+        for j in 1:model.k
+            if !(j in labels)
+                new_centroids[j, :] = X[rand(1:size(X, 1)), :]
+            end
+        end
         if maximum(sqrt.(sum((model.centroids .- new_centroids) .^ 2, dims=2))) < model.tol
             break
         end
