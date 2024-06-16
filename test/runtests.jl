@@ -1,108 +1,51 @@
 using Test
-using Cluster
 include("DataGenerator.jl")
 using .DataGenerator
-using Suppressor
 
-output = ""
+
+struct testCase
+    data::Array{Float64}
+    labels::Array{Int}
+    name::String
+    num_samples::Int
+    num_features::Int
+    num_classes::Int
+
+    function testCase(data, labels, name, num_samples, num_features, num_classes)
+        new(data, labels, name, num_samples, num_features, num_classes)
+    end
+
+    function testCase(num_samples, num_features, num_classes, name)
+        data, labels = create_labeled_data(num_samples, num_features, num_classes)
+        new(data, labels, name, num_samples, num_features, num_classes)
+    end
+end
+
+testCases = [
+           # 50 samples, 2 features, 3 classes
+    testCase(50, 2, 3, "Basic functionality"),
+    testCase(50, 3, 2, "3D data"),
+    testCase(50, 2, 5, "More clusters than dimensions"),
+    testCase(50, 2, 2, "Two clusters"),
+    testCase(50, 2, 4, "Four clusters"),
+    testCase(50, 2, 6, "Six clusters"),
+    testCase(50, 2, 8, "Eight clusters"),
+    testCase(50, 2, 10, "Ten clusters"),
+    testCase(50, 2, 20, "Twenty clusters"),
+    testCase(1, 2, 1, "Single 2d point"),
+    testCase(10, 1, 2, "Ten 1d points"),
+    testCase(10, 2, 2, "Ten 2d points"),
+    testCase(10, 3, 2, "Ten 3d points"),
+    testCase(1, 1, 1, "Single 1d point"),
+    testCase(10, 2, 30, "Large number of clusters"),
+    testCase(200, 5, 4, "Higher dimensions"),
+    testCase(1000, 10, 5, "Large dataset"),
+    #testCase(10000, 20, 10, "Very large dataset")
+]
+
 
 @testset "Cluster.jl Tests" begin
-    @testset "K-means" begin
-
-        @testset "K-means Basic Functionality" begin
-            num_samples = 50
-            num_features = 2
-            num_classes = 3
-
-            # Generate test data
-            data, labels = create_labeled_data(num_samples, num_features, num_classes)
-
-            # Create and fit KMeans model
-            model = KMeans(k=num_classes, mode="kmeans")
-
-            # Suppress and capture any output during fit!
-            output = @capture_out begin
-                fit!(model, data)
-            end
-
-            # Test if the model has the correct number of centroids
-            @test size(model.centroids)[1] == num_classes
-            @test size(model.centroids)[2] == num_features
-
-            # Test if the model assigns labels to all data points
-            @test length(model.labels) == num_samples * num_classes
-
-            # Test if the model converges
-            @test model.centroids != zeros(Float64, 0, 0)
-        end
-
-        # Ensure there is no output
-        @testset "K-means no print output" begin
-            @test isempty(output)
-        end
-    end
-    @testset "K-means++" begin
-        @testset "K-means++ Basic Functionality" begin
-            num_samples = 50
-            num_features = 2
-            num_classes = 3
-
-            # Generate test data
-            data, labels = create_labeled_data(num_samples, num_features, num_classes)
-
-            # Create and fit KMeans++ model
-            model = KMeans(k=num_classes, mode="kmeanspp")
-
-            # Suppress and capture any output during fit!
-            output = @capture_out begin
-                fit!(model, data)
-            end
-
-            # Test if the model has the correct number of centroids
-            @test size(model.centroids)[1] == num_classes
-            @test size(model.centroids)[2] == num_features
-
-            # Test if the model assigns labels to all data points
-            @test length(model.labels) == num_samples * num_classes
-
-            # Test if the model converges
-            @test model.centroids != zeros(Float64, 0, 0)
-        end
-
-        # Ensure there is no output
-        @testset "K-means++ no print output" begin
-            @test isempty(output)
-        end
-    end
-    @testset "BKMeans" begin
-
-        @testset "BKMeans Basic Functionality" begin
-            num_samples = 50
-            num_features = 2
-            num_classes = 3
-
-            # Generate test data
-            data, labels = create_labeled_data(num_samples, num_features, num_classes)
-
-            # Create and fit BKMeans model
-            base_model = KMeans(k=2, mode="kmeans")
-            model = BKMeans(k=num_classes, kmeans=base_model)
-
-            # Suppress and capture any output during fit!
-            output = @capture_out begin
-                fit!(model, data)
-            end
-
-            # Test if the model assigns labels to all data points
-            @test length(model.labels) == num_samples * num_classes
-
-            # Test if the model converges
-            @test model.labels != Int[]
-        end
-
-        # Ensure there is no output
-        @testset "BKMeans no print output" begin
-            @test isempty(output)
-        end
-    end
+    include("test_kmeans.jl")
+    include("test_kmeanspp.jl")
+    include("test_bkmeans.jl")
 end
