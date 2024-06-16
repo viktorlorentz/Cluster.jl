@@ -4,6 +4,10 @@ using Random
 using LinearAlgebra
 using Statistics
 
+
+export KMeans, init_centroids, fit!, compute_distance, assign_center, update_centroids, predict, BKMeans
+
+
 # KMeans definition
 """
     mutable struct KMeans
