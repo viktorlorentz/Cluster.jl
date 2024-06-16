@@ -153,11 +153,11 @@ function fit!(model::KMeans, X)
     model.centroids = init_centroids(X, model.k, model.mode)
 
     for i in 1:model.max_try
-        println(model.centroids)
+        #println(model.centroids)
         D = compute_distance(X, model.centroids)
-        println(D)
+        #println(D)
         model.labels = assign_center(D)
-        println(model.labels)
+        #println(model.labels)
         new_centroids = update_centroids(X, model.labels, model)
 
         for j in 1:model.k
@@ -358,24 +358,24 @@ function fit!(model::BKMeans, X)
     clusters = [X]
 
     while length(clusters) < model.k
-        println(clusters)
+        #println(clusters)
         sse = [sum(compute_distance(clusters[i], mean(clusters[i], dims=1)) .^ 2) for i in 1:length(clusters)]
         i = argmax(sse)
-        println(sse)
+        #println(sse)
         sub_model = deepcopy(model.kmeans)
         fit!(sub_model, clusters[i])
-        println(clusters[i])
+        #println(clusters[i])
 
 
         new_clusters = [clusters[i][sub_model.labels .== 1, :], clusters[i][sub_model.labels .== 2, :]]
 
         deleteat!(clusters, i)
-        # println(clusters)
+        # #println(clusters)
         for new_cluster in new_clusters
             push!(clusters, new_cluster)
         end
-        # println(clusters)
-        # println("safe222222222222")
+        # #println(clusters)
+        # #println("safe222222222222")
 
     end
     model.labels= []
@@ -385,7 +385,7 @@ function fit!(model::BKMeans, X)
             push!(model.labels, g1)
         end
     end
-    # println(model.labels)
+    # #println(model.labels)
 end
 
 model = BKMeans()

@@ -4,6 +4,8 @@ include("DataGenerator.jl")
 using .DataGenerator
 using Suppressor
 
+output = ""
+
 @testset "Cluster.jl Tests" begin
     @testset "K-means" begin
 
