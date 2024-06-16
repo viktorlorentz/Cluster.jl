@@ -55,22 +55,7 @@ function create_labeled_data(num_samples_per_class::Int, num_features::Int, num_
     return vcat(data...), labels  # Return the data and labels as a matrix and a vector
 end
 
-# ╔═╡ 0e11467a-ec17-43a0-bd29-4711dd5d8aee
-@bind num_samples_per_class Slider(5:200, default=20, show_value=true)
-
-# ╔═╡ 146996c3-ea17-49e2-930e-40e1e04d7e49
-@bind num_features Slider(1:4 , default=2, show_value=true)
-
-# ╔═╡ c060f1ea-0a86-4fa3-980a-57b08912e87e
-@bind num_classes Slider(1:50 , default=3, show_value=true)
-
-# ╔═╡ 853c6935-f73c-4076-98af-0896ca0cdae2
-@bind spread Slider(0:0.1:10 , default=4, show_value=true)
-
-# ╔═╡ fb517c86-f37a-44da-a5c0-9f97094215a5
-@bind clustering_algorithm Select(["kmeans", "kmeanspp", "bkmeans"])
-
-# ╔═╡ 726f9420-db77-442a-9fa3-09a1dad985c4
+# ╔═╡ 6304380c-7139-4e21-97eb-f49e37c9b325
 begin
 # Function to plot data
 function plot_sample_data!(ax, data, labels, num_classes, title = "Sample Data")
@@ -84,14 +69,28 @@ function plot_sample_data!(ax, data, labels, num_classes, title = "Sample Data")
 end
 
 # Function to create subplots
-function create_subplots(data, labels, predicted_labels, num_classes)
-    fig = plot(layout = (2, 1), size=(800, 1100))
+function create_subplots(data, labels, predicted_labels, num_classes, model)
+    fig = plot(layout = (3, 1), size=(800, 1400))
     plot_sample_data!(fig[1], data, labels, num_classes, "Sample Data")
     plot_sample_data!(fig[2], data, predicted_labels, num_classes, "Prediction")
     
     # Mark wrong predictions with an "x"
     wrong_predictions = labels .!= predicted_labels
     scatter!(fig[2], data[wrong_predictions, 1], data[wrong_predictions, 2], marker=:x, color=:black, label="Wrong Prediction")
+    
+    # Create a grid of points
+    x_min, x_max = minimum(data[:, 1]), maximum(data[:, 1])
+    y_min, y_max = minimum(data[:, 2]), maximum(data[:, 2])
+    x_grid = range(x_min, x_max, length=100)
+    y_grid = range(y_min, y_max, length=100)
+    grid_x, grid_y = repeat(x_grid, inner=100), repeat(y_grid, outer=100)
+    grid_points = hcat(grid_x, grid_y)
+    
+    # Predict labels for the grid points
+    grid_labels = Cluster.predict(model, grid_points)
+    
+    # Plot the color map using scatter
+    scatter!(fig[3], grid_x, grid_y, color=grid_labels, marker=:rect, markerstrokewidth=0,ms=4, title="Decision Boundary", legend=false)
     
     return fig
 end
@@ -114,11 +113,34 @@ function match_labels(true_labels, predicted_labels, num_classes)
     matched_labels = [label_mapping[label] for label in predicted_labels]
     return matched_labels
 end
+end
+
+# ╔═╡ 5753354e-9362-41ef-ab92-2954cd9838dc
+@bind seed Slider(0:1000000, default=123, show_value=true)
+
+# ╔═╡ 0e11467a-ec17-43a0-bd29-4711dd5d8aee
+@bind num_samples_per_class Slider(5:200, default=20, show_value=true)
+
+# ╔═╡ 146996c3-ea17-49e2-930e-40e1e04d7e49
+@bind num_features Slider(1:4 , default=2, show_value=true)
+
+# ╔═╡ c060f1ea-0a86-4fa3-980a-57b08912e87e
+@bind num_classes Slider(1:25 , default=3, show_value=true)
+
+# ╔═╡ 853c6935-f73c-4076-98af-0896ca0cdae2
+@bind spread Slider(0:0.1:10 , default=4, show_value=true)
+
+# ╔═╡ fb517c86-f37a-44da-a5c0-9f97094215a5
+@bind clustering_algorithm Select(["kmeans", "kmeanspp", "bkmeans"])
+
+# ╔═╡ 726f9420-db77-442a-9fa3-09a1dad985c4
+begin
+
 
 # Main block
 begin
     # Generate sample data
-    data, labels = create_labeled_data(num_samples_per_class, num_features, num_classes, spread = spread)
+    data, labels = create_labeled_data(num_samples_per_class, num_features, num_classes, spread = spread, seed = seed)
 
     # Select clustering algorithm
     if clustering_algorithm == "kmeans"
@@ -137,8 +159,9 @@ begin
     matched_labels = match_labels(labels, model.labels, num_classes)
 
     # Create subplots
-    create_subplots(data, labels, matched_labels, num_classes)
+    create_subplots(data, labels, matched_labels, num_classes, model)
 end
+
 end
 
 # ╔═╡ Cell order:
@@ -150,6 +173,8 @@ end
 # ╠═557bdb83-40db-4383-9baa-ddf144bd6f8f
 # ╠═b55a6ff5-4035-46cf-926e-8142c533843b
 # ╠═9516a229-1b61-4586-a1d6-4fa684e8811b
+# ╠═6304380c-7139-4e21-97eb-f49e37c9b325
+# ╠═5753354e-9362-41ef-ab92-2954cd9838dc
 # ╠═0e11467a-ec17-43a0-bd29-4711dd5d8aee
 # ╠═146996c3-ea17-49e2-930e-40e1e04d7e49
 # ╠═c060f1ea-0a86-4fa3-980a-57b08912e87e
