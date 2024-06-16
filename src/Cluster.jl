@@ -21,7 +21,7 @@ A structure representing a KMeans clustering model.
 """
 mutable struct KMeans
     k::Int
-    mode::Symbol
+    mode::String
     max_try::Int
     tol::Float64
     centroids::Array{Float64,2}
@@ -44,7 +44,7 @@ Creates a new KMeans clustering model.
 A `KMeans` model with the specified parameters.
 
 """
-KMeans(; k::Int=3, mode::Symbol=:kmeans, max_try::Int=100, tol::Float64=1e-4) = KMeans(
+KMeans(; k::Int=3, mode::String=:kmeans, max_try::Int=100, tol::Float64=1e-4) = KMeans(
     k,
     mode,
     max_try,
@@ -84,14 +84,14 @@ centroids = init_centroids(X, K, mode)
 function init_centroids(X, K, mode)
 
 
-    if mode == 1
+    if mode == "kmeans"
         #generate random vector with the length of the data, then choose first K values
         row, col = size(X)
         permutation = randperm(row)
         idx = permutation[1:K]
         centroids = X[idx, :]
 
-    elseif mode == 2
+    elseif mode == "kmeanspp"
         # kmeans++ initialization
         row, col = size(X)
         permutation = randperm(row)
@@ -146,11 +146,21 @@ fit!(model, X)
 """
 function fit!(model::KMeans, X)
 
+    model.centroids = init_centroids(X, model.k, model.mode)
 
     for i in 1:model.max_try
+        println(model.centroids)
         D = compute_distance(X, model.centroids)
-        labels = assign_center(D)
-        new_centroids = update_centroids(X, labels, model)
+        println(D)
+        model.labels = assign_center(D)
+        println(model.labels)
+        new_centroids = update_centroids(X, model.labels, model)
+
+        for j in 1:model.k
+            if !(j in model.labels)
+                new_centroids[j, :] = X[rand(1:size(X, 1)), :]
+            end
+        end
 
         if maximum(sqrt.(sum((model.centroids .- new_centroids) .^ 2, dims=2))) < model.tol
             break
@@ -298,10 +308,29 @@ data = [
 ]
 test_data = [1.1 1.1 1.2]
 model = KMeans(k=3)
-fit!(model, data)
+fit!(model, data)Symbol
 labels = predict(model, test_data)
 ```
 """
+
+data = [
+    # Cluster 1
+    1.0 1.0 ;
+    1.5 2.0 ;
+    1.3 1.8 ;
+    # Cluster 2
+    5.0 7.0 ;
+    5.5 7.5 ;
+    6.0 7.0 ;
+    # Cluster 3
+    8.0 1.0 ;
+    8.5 1.5 ;
+    8.3 1.2 ;
+]
+test_data = [1.1 1.1 1.2]
+model = KMeans(mode="kmeans")
+# fit!(model, data)
+
 function predict(model::KMeans, X)
 
 
@@ -309,4 +338,52 @@ function predict(model::KMeans, X)
     return assign_center(D)
 end
 
+mutable struct BKMeans
+    k::Int
+    kmeans::KMeans
+    labels::Array{Int,1}
+end
+
+BKMeans(; k::Int=3, kmeans::KMeans=KMeans(k=2, mode="kmeans")) = BKMeans(
+    k,
+    kmeans,
+    Int[]
+)
+
+function fit!(model::BKMeans, X)
+    clusters = [X]
+
+    while length(clusters) < model.k
+        println(clusters)
+        sse = [sum(compute_distance(clusters[i], mean(clusters[i], dims=1)) .^ 2) for i in 1:length(clusters)]
+        i = argmax(sse)
+        println(sse)
+        sub_model = deepcopy(model.kmeans)
+        fit!(sub_model, clusters[i])
+        println(clusters[i])
+
+        
+        new_clusters = [clusters[i][sub_model.labels .== 1, :], clusters[i][sub_model.labels .== 2, :]] 
+
+        deleteat!(clusters, i)
+        # println(clusters)
+        for new_cluster in new_clusters
+            push!(clusters, new_cluster)
+        end
+        # println(clusters)
+        # println("safe222222222222")
+     
+    end
+    model.labels= []
+    for g1 in 1:length(clusters)
+        rows,_ = size(clusters[g1])
+        for g2 in 1:rows
+            push!(model.labels, g1)
+        end
+    end
+    # println(model.labels)
+end
+
+model = BKMeans()
+fit!(model, data)
 end
