@@ -4,9 +4,7 @@ using Random
 using LinearAlgebra
 using Statistics
 
-
 export KMeans, init_centroids, fit!, compute_distance, assign_center, update_centroids, predict, BKMeans
-
 
 # KMeans definition
 """
@@ -48,14 +46,21 @@ Creates a new KMeans clustering model.
 A `KMeans` model with the specified parameters.
 
 """
-KMeans(; k::Int=3, mode::String=:kmeans, max_try::Int=100, tol::Float64=1e-4) = KMeans(
-    k,
-    mode,
-    max_try,
-    tol,
-    zeros(Float64, 0, 0),  # Initialize centroids as an empty 2D array
-    Int[]                  # Initialize labels as an empty 1D array
-)
+function KMeans(; k::Int=3, mode::String="kmeans", max_try::Int=100, tol::Float64=1e-4)
+    if !isa(k, Int) || k <= 0
+        throw(ArgumentError("k must be a positive integer"))
+    end
+    if !isa(max_try, Int) || max_try <= 0
+        throw(ArgumentError("max_try must be a positive integer"))
+    end
+    if !isa(tol, Float64) || tol <= 0
+        throw(ArgumentError("tol must be a positive number"))
+    end
+    if mode != "kmeans" && mode != "kmeanspp"
+        throw(ArgumentError("mode must be either 'kmeans' or 'kmeanspp'"))
+    end
+    return KMeans(k, mode, max_try, tol, zeros(Float64, 0, 0), Int[])
+end
 
 """
     init_centroids(X::Array{Float64,2}, K::Int, mode::Symbol) -> Array{Float64,2}
@@ -86,10 +91,15 @@ centroids = init_centroids(X, K, mode)
 ```
 """
 function init_centroids(X, K, mode)
-
+    if !isa(K, Int) || K <= 0
+        throw(ArgumentError("K must be a positive integer"))
+    end
+    if mode != "kmeans" && mode != "kmeanspp"
+        throw(ArgumentError("mode must be either 'kmeans' or 'kmeanspp'"))
+    end
 
     if mode == "kmeans"
-        #generate random vector with the length of the data, then choose first K values
+        # Generate random vector with the length of the data, then choose first K values
         row, col = size(X)
         permutation = randperm(row)
         idx = permutation[1:K]
@@ -149,15 +159,15 @@ fit!(model, X)
 ```
 """
 function fit!(model::KMeans, X)
+    if size(X, 1) == 0 || size(X, 2) == 0
+        throw(ArgumentError("X must be a non-empty matrix"))
+    end
 
     model.centroids = init_centroids(X, model.k, model.mode)
 
     for i in 1:model.max_try
-        #println(model.centroids)
         D = compute_distance(X, model.centroids)
-        #println(D)
         model.labels = assign_center(D)
-        #println(model.labels)
         new_centroids = update_centroids(X, model.labels, model)
 
         for j in 1:model.k
@@ -200,8 +210,6 @@ D = compute_distance(X, centroids)
 ```
 """
 function compute_distance(X, centroids)
-
-
     x = size(X)
     y = size(centroids)
     D = zeros(x[1], y[1])
@@ -236,7 +244,6 @@ labels = assign_center(D)
 ```
 """
 function assign_center(D)
-
     return [argmin(D[i, :]) for i in 1:size(D, 1)]
 end
 
@@ -267,15 +274,13 @@ new_centroids = update_centroids(X, labels, model)
 ```
 """
 function update_centroids(X, label_vector, model)
-        r, c = size(X)
+    r, c = size(X)
     centroids = zeros(model.k, c)
 
     for label in 1:model.k
         # Create a mask for the current label
         mask = label_vector .== label
         # Average the values using the mask
-
-
         centroids[label, :] = mean(X[mask, :], dims=1)
     end
 
@@ -312,32 +317,11 @@ data = [
 ]
 test_data = [1.1 1.1 1.2]
 model = KMeans(k=3)
-fit!(model, data)Symbol
+fit!(model, data)
 labels = predict(model, test_data)
 ```
 """
-
-data = [
-    # Cluster 1
-    1.0 1.0 ;
-    1.5 2.0 ;
-    1.3 1.8 ;
-    # Cluster 2
-    5.0 7.0 ;
-    5.5 7.5 ;
-    6.0 7.0 ;
-    # Cluster 3
-    8.0 1.0 ;
-    8.5 1.5 ;
-    8.3 1.2 ;
-]
-test_data = [1.1 1.1 1.2]
-model = KMeans(mode="kmeans")
-# fit!(model, data)
-
 function predict(model::KMeans, X)
-
-
     D = compute_distance(X, model.centroids)
     return assign_center(D)
 end
@@ -348,46 +332,42 @@ mutable struct BKMeans
     labels::Array{Int,1}
 end
 
-BKMeans(; k::Int=3, kmeans::KMeans=KMeans(k=2, mode="kmeans")) = BKMeans(
-    k,
-    kmeans,
-    Int[]
-)
+function BKMeans(; k::Int=3, kmeans::KMeans=KMeans(k=2, mode="kmeans"))
+    if !isa(k, Int) || k <= 0
+        throw(ArgumentError("k must be a positive integer"))
+    end
+    if !isa(kmeans, KMeans)
+        throw(ArgumentError("kmeans must be an instance of KMeans"))
+    end
+    return BKMeans(k, kmeans, Int[])
+end
 
 function fit!(model::BKMeans, X)
+    if size(X, 1) == 0 || size(X, 2) == 0
+        throw(ArgumentError("X must be a non-empty matrix"))
+    end
+
     clusters = [X]
 
     while length(clusters) < model.k
-        #println(clusters)
         sse = [sum(compute_distance(clusters[i], mean(clusters[i], dims=1)) .^ 2) for i in 1:length(clusters)]
         i = argmax(sse)
-        #println(sse)
         sub_model = deepcopy(model.kmeans)
         fit!(sub_model, clusters[i])
-        #println(clusters[i])
-
-
         new_clusters = [clusters[i][sub_model.labels .== 1, :], clusters[i][sub_model.labels .== 2, :]]
 
         deleteat!(clusters, i)
-        # #println(clusters)
         for new_cluster in new_clusters
             push!(clusters, new_cluster)
         end
-        # #println(clusters)
-        # #println("safe222222222222")
-
     end
-    model.labels= []
+    model.labels = []
     for g1 in 1:length(clusters)
-        rows,_ = size(clusters[g1])
+        rows, _ = size(clusters[g1])
         for g2 in 1:rows
             push!(model.labels, g1)
         end
     end
-    # #println(model.labels)
 end
 
-model = BKMeans()
-fit!(model, data)
 end
