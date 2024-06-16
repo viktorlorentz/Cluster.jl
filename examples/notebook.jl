@@ -14,8 +14,22 @@ macro bind(def, element)
     end
 end
 
-# ╔═╡ fd7a69ee-de8d-45c4-99d3-fa4b72327d7c
-Pkg.add(path="/Users/viktorlorentz/Development/ce/julia/Cluster.jl")
+# ╔═╡ d7a3fe86-4355-434c-a33e-a0b64a2a546a
+using Pkg
+
+# ╔═╡ 2dba0803-7a19-4fae-a6ea-de6f13423129
+begin 
+	Pkg.add("Plots")
+	Pkg.add("Random")
+	Pkg.add("PlutoUI")
+	Pkg.activate()
+end
+
+# ╔═╡ d4687371-815f-4c67-9bdb-44a28c0d8122
+Pkg.develop(path="../")
+
+# ╔═╡ f933995d-e6f2-415f-89c6-d21247d371e9
+using Cluster
 
 # ╔═╡ 8a5b6f90-2a68-4e6c-9d8c-3b49ca4ae4b5
 using Plots
@@ -25,9 +39,6 @@ using Random
 
 # ╔═╡ b55a6ff5-4035-46cf-926e-8142c533843b
 using PlutoUI
-
-# ╔═╡ 3204dce5-432c-4cd9-8586-60785e233212
-using Cluster
 
 # ╔═╡ 9516a229-1b61-4586-a1d6-4fa684e8811b
 
@@ -67,7 +78,7 @@ begin
 
 	
 	# Plot the sample data
-	function plot_sample_data(data, labels, num_classes)
+	function plot_sample_data(data, labels, num_classes , title = "Sample Data")
 	    scatter()
 	    for i in 1:num_classes
 	        class_data = data[labels .== i,:]
@@ -75,22 +86,25 @@ begin
 	    end
 	    xlabel!("Feature 1")
 	    ylabel!("Feature 2")
-	    title!("Sample Data")
+	    title!(title)
 	end
 	
 	plot_sample_data(data, labels, num_classes)
 end
 
 # ╔═╡ 3197f17d-61c9-430c-9025-8e1de79e8f57
-Cluster.KMeans()
-
-# ╔═╡ 469dac6d-3e5c-4431-8c23-1f61c02e1935
-using Pkg
-
-# ╔═╡ 38f8de51-cbea-40ac-96b7-8c357c54feb6
-using Revise, Pkg
+begin
+	kmeans = Cluster.KMeans(k=num_classes, mode="kmeanspp")
+	Cluster.fit!(kmeans, data)
+	
+	plot_sample_data(data, kmeans.labels, num_classes, "Prediction")
+end
 
 # ╔═╡ Cell order:
+# ╠═d7a3fe86-4355-434c-a33e-a0b64a2a546a
+# ╠═d4687371-815f-4c67-9bdb-44a28c0d8122
+# ╠═f933995d-e6f2-415f-89c6-d21247d371e9
+# ╠═2dba0803-7a19-4fae-a6ea-de6f13423129
 # ╠═8a5b6f90-2a68-4e6c-9d8c-3b49ca4ae4b5
 # ╠═557bdb83-40db-4383-9baa-ddf144bd6f8f
 # ╠═b55a6ff5-4035-46cf-926e-8142c533843b
@@ -100,8 +114,4 @@ using Revise, Pkg
 # ╠═c060f1ea-0a86-4fa3-980a-57b08912e87e
 # ╠═853c6935-f73c-4076-98af-0896ca0cdae2
 # ╠═726f9420-db77-442a-9fa3-09a1dad985c4
-# ╠═38f8de51-cbea-40ac-96b7-8c357c54feb6
-# ╠═469dac6d-3e5c-4431-8c23-1f61c02e1935
-# ╠═fd7a69ee-de8d-45c4-99d3-fa4b72327d7c
-# ╠═3204dce5-432c-4cd9-8586-60785e233212
 # ╠═3197f17d-61c9-430c-9025-8e1de79e8f57
