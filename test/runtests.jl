@@ -2,6 +2,8 @@ using Test
 include("DataGenerator.jl")
 using .DataGenerator
 
+const TRAIN_TEST_RATIO = 0.85
+const RAND_INDEX_THRESHOLD = 0.8
 
 struct testCase
     data::Array{Float64}
@@ -42,7 +44,6 @@ testCases = [
     testCase(1000, 10, 5, "Large dataset"),
     #testCase(10000, 20, 10, "Very large dataset")
 ]
-
 
 @testset "Cluster.jl Tests" begin
     include("test_kmeans.jl")
