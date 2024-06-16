@@ -1,8 +1,8 @@
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.10.3"
+julia_version = "1.10.4"
 manifest_format = "2.0"
-project_hash = "2e5f693dd72ad50d54fae71c4ca6f2002872a22c"
+project_hash = "327acefa7f22e94506271140cbd354eb28b46a63"
 
 [[deps.Artifacts]]
 uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
@@ -105,6 +105,12 @@ version = "1.10.0"
 deps = ["Artifacts", "Libdl", "libblastrampoline_jll"]
 uuid = "bea87d4a-7f5b-5778-9afe-8cc45184846c"
 version = "7.2.1+1"
+
+[[deps.Suppressor]]
+deps = ["Logging"]
+git-tree-sha1 = "9143c41bd539a8885c79728b9dedb0ce47dc9819"
+uuid = "fd094767-a336-5f1f-9728-57cf17d0bbfb"
+version = "0.2.7"
 
 [[deps.Test]]
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
