@@ -9,3 +9,17 @@ This is a package for clustering algorithms in Julia. It was created by a group 
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://viktorlorentz.github.io/Cluster.jl/dev/)
 [![Build Status](https://github.com/viktorlorentz/Cluster.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/viktorlorentz/Cluster.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![Coverage](https://codecov.io/gh/viktorlorentz/Cluster.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/viktorlorentz/Cluster.jl)
+
+## Installation
+
+The package can be installed by running the following command in the Julia REPL:
+
+```julia
+using Pkg
+Pkg.add(url="https://github.com/viktorlorentz/Cluster.jl")
+```
+
+## Demo
+
+You can find a demo here:
+![Binder](https://mybinder.org/badge_logo.svg)](https://binder.plutojl.org/v0.19.36/open?url=https%253A%252F%252Fraw.githubusercontent.com%252Fviktorlorentz%252FCluster.jl%252Fmain%252Fexamples%252Fnotebook.jl)
