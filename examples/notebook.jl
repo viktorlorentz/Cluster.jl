@@ -125,14 +125,12 @@ Samples per class:\
 $(@bind num_samples_per_class Slider(5:200, default=20, show_value=true))\
 Features/ Dimensions:\
 $(@bind num_features Slider(1:4 , default=2, show_value=true))\
-Features/ Dimensions:\
-$(@bind num_features Slider(1:4 , default=2, show_value=true))\
 Classes:\
 $(@bind num_classes Slider(1:25 , default=3, show_value=true))\
 Spread of cluster:\
 $(@bind spread Slider(0:0.1:10 , default=4, show_value=true)))\
 Clustering algorithm:\
-$(@bind clustering_algorithm Select([\"kmeans\", \"kmeanspp\", \"bkmeans\"])))\
+$(@bind clustering_algorithm Select([\"kmeans\", \"kmeanspp\", \"bkmeans\"]))\
 "
 
 # ╔═╡ 726f9420-db77-442a-9fa3-09a1dad985c4
