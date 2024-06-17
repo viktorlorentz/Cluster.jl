@@ -116,7 +116,7 @@ end
 end
 
 # ╔═╡ b62db7d3-ced4-4d36-8f36-308bd3ab9e00
-md"# Demo"
+md"# Cluster.jl Demo"
 
 # ╔═╡ 35dc71ef-2fa3-4ec9-953e-61548f29562c
 md"Seed:\

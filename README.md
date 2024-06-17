@@ -21,5 +21,5 @@ Pkg.add(url="https://github.com/viktorlorentz/Cluster.jl")
 
 ## Demo
 
-You can find a demo here:
-![Binder](https://mybinder.org/badge_logo.svg)](https://binder.plutojl.org/v0.19.36/open?url=https%253A%252F%252Fraw.githubusercontent.com%252Fviktorlorentz%252FCluster.jl%252Fmain%252Fexamples%252Fnotebook.jl)
+You can find a demo here:\
+[![Binder](https://mybinder.org/badge_logo.svg)](https://binder.plutojl.org/v0.19.36/open?url=https%253A%252F%252Fraw.githubusercontent.com%252Fviktorlorentz%252FCluster.jl%252Fmain%252Fexamples%252Fnotebook.jl)
