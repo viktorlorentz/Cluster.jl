@@ -387,60 +387,53 @@ end
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function compute_objective_function(X, centroids)
     x = size(X)
     y = size(centroids)
     D = zeros(x[1], y[1])
     delta = 0.0001
     k = 2
-
-    println("D",size(D))
     
     for i in 1:y[1]
         for j in 1:x[1]
-            D[j, i] = log(norm(X[j,:].-centroids[i,:].^k .+delta))
+            D[j, i] = log(norm(X[j,:].-centroids[i,:].^k .+ delta))
         end
     end
-    #println("X",size(X))
-    #println("centroids",size(centroids))
-    #print(size(D))
+
     return D
 
 end
 
-#=
+
 function update_centroids_dc(X, label_vector, model)
     r, c = size(X)
     centroids = zeros(model.k, c)
-
-    for label in 1:model.k
+    
+    for label in 1:1
+        
         # Create a mask for the current label
         mask = label_vector .== label
-        # sum over log norm of values using the mask
-        centroids[label, :] = sum(log(norm((X[mask, :], dims=1))))
+        
+        maskedvl = X[mask,:]
+        println("f",maskedvl)
+        println("g",maskedvl[:,label])
+
+        print("h",norm(maskedvl[:,label]))
+        # maskedvl[:,i]
+        #sum over log norm of values using the mask
+        #println(norm(X[mask, :]),dims=1)
+
+        #norms = [norm(X[mask, :]) for i in 1:eachcol(X[mask, :])]
+
+        #println(mean(X[mask, :], dims=1))
+        #centroids[label, :] = sum(log(norm((X[mask, :], dims=1))))
+        
     end
 
     return centroids
+    
 end
-=#
+
 
 function fit_dc!(model, X)
     
@@ -451,12 +444,13 @@ function fit_dc!(model, X)
     model.centroids = init_centroids(X, model.k, model.mode)
 
     for i in 1:model.max_try
-        #println("here")
+        
         D = compute_objective_function(X, model.centroids)
         
         model.labels = assign_center(D)
         
-        new_centroids = update_centroids(X, model.labels, model)
+        new_centroids = update_centroids_dc(X, model.labels, model)
+
         #=
         for j in 1:model.k
             if !(j in model.labels)
@@ -525,12 +519,8 @@ data_1 = [
     # 8.6 1.8
 ]
 #K = DC(3,,)
-K = DC(3, "kmeans",20,1e-4,zeros(Float64, 0, 0), Int[])
+K = DC(3, "kmeans",2,1e-4,zeros(Float64, 0, 0), Int[])
 
-
-#function BKMeans(; k::Int=3, kmeans::KMeans=KMeans(k=2, mode="kmeans"))
-
-#print(K.centroids)
 
 fit_dc!(K,data_1)
 
