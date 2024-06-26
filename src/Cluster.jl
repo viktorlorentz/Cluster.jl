@@ -369,5 +369,112 @@ function fit!(model::BKMeans, X)
         end
     end
 end
+#####
+
+#####
+
+function compute_objective_function(X, centroids)
+    x = size(X)
+    y = size(centroids)
+    D = zeros(x[1], y[1])
+    delta = 0.0001
+    k = 2
+
+    for i in 1:y[1]
+        for j in 1:x[1]
+            D[j, i] = log(norm(X[j,:].-centroids[i,:].^k +delta))
+        end
+    end
+    return D
+
+end
+
+function update_centroids_dc(X, label_vector, model)
+    r, c = size(X)
+    centroids = zeros(model.k, c)
+
+    for label in 1:model.k
+        # Create a mask for the current label
+        mask = label_vector .== label
+        # Average the values using the mask
+        centroids[label, :] = sum(log(norm((X[mask, :], dims=1))))
+    end
+    print("yes")
+    print(centroids)
+
+    return centroids
+end
+
+function fit_dc!(model::KMeans, X)
+    if size(X, 1) == 0 || size(X, 2) == 0
+        throw(ArgumentError("X must be a non-empty matrix"))
+    end
+
+    model.centroids = init_centroids(X, model.k, model.mode)
+
+    for i in 1:model.max_try
+        D = compute_objective_function(X, model.centroids)
+        model.labels = assign_center(D)
+        new_centroids = update_centroids_dc(X, model.labels, model)
+
+        for j in 1:model.k
+            if !(j in model.labels)
+                new_centroids[j, :] = X[rand(1:size(X, 1)), :]
+            end
+        end
+
+        if maximum(sqrt.(sum((model.centroids .- new_centroids) .^ 2, dims=2))) < model.tol
+            break
+        end
+        model.centroids = new_centroids
+    end
+
+end
+
+data_1 = [
+    # Cluster 1
+    1.0 1.0;
+    1.5 2.0;
+    # 1.3 1.8;
+    # 1.2 1.2;
+    # 0.8 0.9;
+    # 1.0 1.1;
+    # 1.3 1.3;
+    # 1.2 1.3;
+    # 1.3 1.4;
+    # 1.5 1.5;
+    
+    # Cluster 2
+    5.0 7.0;
+    5.5 7.5;
+    # 6.0 7.0;
+    # 5.8 7.2;
+    # 6.2 7.5;
+    # 5.9 6.8;
+    # 5.6 7.1;
+    # 6.3 7.6;
+    # 5.8 6.7;
+    # 5.8 7.7;
+    
+    # Cluster 3
+    8.0 1.0;
+    8.5 1.5;
+    # 8.3 1.2;
+    # 8.7 1.8;
+    # 8.4 1.4;
+    # 8.1 1.1;
+    # 8.6 1.6;
+    # 8.4 1.3;
+    # 8.3 1.5;
+    # 8.6 1.8
+]
+K = KMeans()
+
+cent = init_centroids(data_1,3,1)
+
+K.centroids = cent
+
+fit_dc!(K,data_1)
+
 
 end
