@@ -369,9 +369,41 @@ function fit!(model::BKMeans, X)
         end
     end
 end
-#####
 
-#####
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function compute_objective_function(X, centroids)
     x = size(X)
@@ -380,15 +412,21 @@ function compute_objective_function(X, centroids)
     delta = 0.0001
     k = 2
 
+    println("D",size(D))
+    
     for i in 1:y[1]
         for j in 1:x[1]
-            D[j, i] = log(norm(X[j,:].-centroids[i,:].^k +delta))
+            D[j, i] = log(norm(X[j,:].-centroids[i,:].^k .+delta))
         end
     end
+    #println("X",size(X))
+    #println("centroids",size(centroids))
+    #print(size(D))
     return D
 
 end
 
+#=
 function update_centroids_dc(X, label_vector, model)
     r, c = size(X)
     centroids = zeros(model.k, c)
@@ -396,27 +434,30 @@ function update_centroids_dc(X, label_vector, model)
     for label in 1:model.k
         # Create a mask for the current label
         mask = label_vector .== label
-        # Average the values using the mask
+        # sum over log norm of values using the mask
         centroids[label, :] = sum(log(norm((X[mask, :], dims=1))))
     end
-    print("yes")
-    print(centroids)
 
     return centroids
 end
+=#
 
-function fit_dc!(model::KMeans, X)
+function fit_dc!(model, X)
+    
     if size(X, 1) == 0 || size(X, 2) == 0
         throw(ArgumentError("X must be a non-empty matrix"))
     end
-
+    
     model.centroids = init_centroids(X, model.k, model.mode)
 
     for i in 1:model.max_try
+        #println("here")
         D = compute_objective_function(X, model.centroids)
+        
         model.labels = assign_center(D)
-        new_centroids = update_centroids_dc(X, model.labels, model)
-
+        
+        new_centroids = update_centroids(X, model.labels, model)
+        #=
         for j in 1:model.k
             if !(j in model.labels)
                 new_centroids[j, :] = X[rand(1:size(X, 1)), :]
@@ -427,8 +468,23 @@ function fit_dc!(model::KMeans, X)
             break
         end
         model.centroids = new_centroids
+        =#
     end
+    
+    
 
+end
+
+
+
+
+mutable struct DC
+    k::Int
+    mode
+    max_try::Int
+    tol::Float64
+    centroids::Array{Float64,2}
+    labels::Array{Int,1}
 end
 
 data_1 = [
@@ -468,13 +524,14 @@ data_1 = [
     # 8.3 1.5;
     # 8.6 1.8
 ]
-K = KMeans()
+#K = DC(3,,)
+K = DC(3, "kmeans",20,1e-4,zeros(Float64, 0, 0), Int[])
 
-cent = init_centroids(data_1,3,1)
 
-K.centroids = cent
+#function BKMeans(; k::Int=3, kmeans::KMeans=KMeans(k=2, mode="kmeans"))
+
+#print(K.centroids)
 
 fit_dc!(K,data_1)
-
 
 end
