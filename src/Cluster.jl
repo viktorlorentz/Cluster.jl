@@ -387,16 +387,18 @@ end
 
 
 
-function compute_objective_function(X, centroids)
+function compute_objective_function(X, centroids,k)
     x = size(X)
     y = size(centroids)
     D = zeros(x[1], y[1])
     delta = 0.0001
-    k = 2
     
+    ##if k = 2 the clustering criterion is the same as k means
+
     for i in 1:y[1]
         for j in 1:x[1]
-            D[j, i] = log(norm(X[j,:].-centroids[i,:].^k .+ delta))
+            #D[j, i] = log(norm(X[j,:].-centroids[i,:].^k .+ delta))
+            D[j, i] = sqrt(sum((X[j, :] .- centroids[i, :]) .^ k .+ delta))
         end
     end
 
@@ -407,30 +409,58 @@ end
 
 function update_centroids_dc(X, label_vector, model)
     r, c = size(X)
+    k = 3
+    δ = 0.0001
     centroids = zeros(model.k, c)
+    #print(size(centroids))
+    new_centers = zeros(k, size(X, 2))
+    #print(size(new_centers))
     
-    for label in 1:1
+    for i in 1:model.k
         
         # Create a mask for the current label
-        mask = label_vector .== label
+        #mask = label_vector .== label
+
+        # Loop over each cluster
         
-        maskedvl = X[mask,:]
-        println("f",maskedvl)
-        println("g",maskedvl[:,label])
-
-        print("h",norm(maskedvl[:,label]))
-        # maskedvl[:,i]
-        #sum over log norm of values using the mask
-        #println(norm(X[mask, :]),dims=1)
-
-        #norms = [norm(X[mask, :]) for i in 1:eachcol(X[mask, :])]
-
-        #println(mean(X[mask, :], dims=1))
-        #centroids[label, :] = sum(log(norm((X[mask, :], dims=1))))
+        # Mask for selecting points belonging to the i-th cluster
+        mask = label_vector .== i
         
+        # Points in the i-th cluster
+        cluster_points = X[mask, :]
+        
+        # Number of points in the i-th cluster
+        num_points = size(cluster_points, 1)
+        
+        # If no points are assigned to the cluster, skip the update
+        if num_points == 0
+            continue
+        end
+
+        # Compute the log-potential for each point in the cluster
+        log_potentials = zeros(num_points)
+        for j in 1:num_points
+            d = cluster_points[j, :]
+            #println("d",d)
+            #println("clusterpoints",cluster_points)
+            temp = cluster_points.-transpose(d).^2
+            #println(sum(temp,dims= 2).+δ)
+            temp2 = sum(temp).+δ
+            print(temp2)
+
+            #log_potential = sum(log.(temp2))
+            #println(log_potential)
+            #log_potential = sum(log.(sum((cluster_points .- d).^2, dims=2) .+ δ))
+            #log_potentials[j] = log_potential
+        end
+        
+        # Find the point with the minimum log-potential
+        min_index = argmin(log_potentials)
+        new_centers[i, :] = cluster_points[min_index, :]
     end
 
-    return centroids
+    return new_centers
+    
     
 end
 
@@ -445,7 +475,7 @@ function fit_dc!(model, X)
 
     for i in 1:model.max_try
         
-        D = compute_objective_function(X, model.centroids)
+        D = compute_objective_function(X, model.centroids,2)
         
         model.labels = assign_center(D)
         
