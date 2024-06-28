@@ -408,21 +408,13 @@ end
 
 
 function update_centroids_dc(X, label_vector, model)
-    r, c = size(X)
     k = 3
     δ = 0.0001
-    centroids = zeros(model.k, c)
-    #print(size(centroids))
     new_centers = zeros(k, size(X, 2))
-    #print(size(new_centers))
     
     for i in 1:model.k
         
-        # Create a mask for the current label
-        #mask = label_vector .== label
 
-        # Loop over each cluster
-        
         # Mask for selecting points belonging to the i-th cluster
         mask = label_vector .== i
         
@@ -441,33 +433,28 @@ function update_centroids_dc(X, label_vector, model)
         log_potentials = zeros(num_points)
         for j in 1:num_points
             d = cluster_points[j, :]
-            #println("d",d)
-            #println("clusterpoints",cluster_points)
+            
             temp = (cluster_points.-transpose(d)).^2
-            #println(sum(temp,dims= 2).+δ)
+            
             temp2 = sum(temp,dims=2).+δ
-            #print(temp2)
-
+ 
             log_potential = sum(log.(temp2))
-            #print(log_potential)
-            #println(log_potential)
-            #log_potential = sum(log.(sum((cluster_points .- d).^2, dims=2) .+ δ))
+    
             log_potentials[j] = log_potential
         end
-        println(log_potentials)
+        
         # Find the point with the minimum log-potential
         min_index = argmin(log_potentials)
         new_centers[i, :] = cluster_points[min_index, :]
-        print("new_centers",new_centers[i,:])
+        
     end
 
     return new_centers
-    
-    
+
 end
 
 
-function fit_dc!(model, X)
+function fit_dc!(model, X,k)
     
     if size(X, 1) == 0 || size(X, 2) == 0
         throw(ArgumentError("X must be a non-empty matrix"))
@@ -477,13 +464,13 @@ function fit_dc!(model, X)
 
     for i in 1:model.max_try
         
-        D = compute_objective_function(X, model.centroids,2)
+        D = compute_objective_function(X, model.centroids,k)
         
         model.labels = assign_center(D)
         
         new_centroids = update_centroids_dc(X, model.labels, model)
 
-        #=
+        
         for j in 1:model.k
             if !(j in model.labels)
                 new_centroids[j, :] = X[rand(1:size(X, 1)), :]
@@ -493,16 +480,20 @@ function fit_dc!(model, X)
         if maximum(sqrt.(sum((model.centroids .- new_centroids) .^ 2, dims=2))) < model.tol
             break
         end
+        
         model.centroids = new_centroids
-        =#
+        print(model.centroids)
+        
     end
     
-    
+    print("trained_centroids",model.centroids)
 
 end
 
-
-
+function predict_dc(model,X)
+    D = compute_objective_function(X, model.centroids,2)
+    return assign_center(D)
+end
 
 mutable struct DC
     k::Int
@@ -512,6 +503,7 @@ mutable struct DC
     centroids::Array{Float64,2}
     labels::Array{Int,1}
 end
+
 
 data_1 = [
     # Cluster 1
@@ -550,10 +542,11 @@ data_1 = [
     # 8.3 1.5;
     # 8.6 1.8
 ]
-#K = DC(3,,)
+
 K = DC(3, "kmeans",20,1e-4,zeros(Float64, 0, 0), Int[])
 
+fit_dc!(K,data_1,2)
 
-fit_dc!(K,data_1)
+print(predict_dc(K,[1.5 2.0]))
 
 end
