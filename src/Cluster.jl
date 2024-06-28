@@ -443,20 +443,22 @@ function update_centroids_dc(X, label_vector, model)
             d = cluster_points[j, :]
             #println("d",d)
             #println("clusterpoints",cluster_points)
-            temp = cluster_points.-transpose(d).^2
+            temp = (cluster_points.-transpose(d)).^2
             #println(sum(temp,dims= 2).+δ)
-            temp2 = sum(temp).+δ
-            print(temp2)
+            temp2 = sum(temp,dims=2).+δ
+            #print(temp2)
 
-            #log_potential = sum(log.(temp2))
+            log_potential = sum(log.(temp2))
+            #print(log_potential)
             #println(log_potential)
             #log_potential = sum(log.(sum((cluster_points .- d).^2, dims=2) .+ δ))
-            #log_potentials[j] = log_potential
+            log_potentials[j] = log_potential
         end
-        
+        println(log_potentials)
         # Find the point with the minimum log-potential
         min_index = argmin(log_potentials)
         new_centers[i, :] = cluster_points[min_index, :]
+        print("new_centers",new_centers[i,:])
     end
 
     return new_centers
@@ -549,7 +551,7 @@ data_1 = [
     # 8.6 1.8
 ]
 #K = DC(3,,)
-K = DC(3, "kmeans",2,1e-4,zeros(Float64, 0, 0), Int[])
+K = DC(3, "kmeans",20,1e-4,zeros(Float64, 0, 0), Int[])
 
 
 fit_dc!(K,data_1)
