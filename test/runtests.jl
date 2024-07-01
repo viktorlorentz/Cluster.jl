@@ -49,4 +49,5 @@ testCases = [
     include("test_kmeans.jl")
     include("test_kmeanspp.jl")
     include("test_bkmeans.jl")
+    include("test_dc.jl")
 end
