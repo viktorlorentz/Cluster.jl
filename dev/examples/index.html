@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Examples · Cluster.jl</title><meta name="title" content="Examples · Cluster.jl"/><meta property="og:title" content="Examples · Cluster.jl"/><meta property="twitter:title" content="Examples · Cluster.jl"/><meta name="description" content="Documentation for Cluster.jl."/><meta property="og:description" content="Documentation for Cluster.jl."/><meta property="twitter:description" content="Documentation for Cluster.jl."/><meta property="og:url" content="https://viktorlorentz.github.io/Cluster.jl/examples/"/><meta property="twitter:url" content="https://viktorlorentz.github.io/Cluster.jl/examples/"/><link rel="canonical" href="https://viktorlorentz.github.io/Cluster.jl/examples/"/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">Cluster.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><a class="tocitem" href="../api/">API</a></li><li class="is-active"><a class="tocitem" href>Examples</a><ul class="internal"><li><a class="tocitem" href="#Basic-Example"><span>Basic Example</span></a></li><li><a class="tocitem" href="#Interactive-Example-Notebook"><span>Interactive Example Notebook</span></a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Examples</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Examples</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/viktorlorentz/Cluster.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/viktorlorentz/Cluster.jl/blob/main/docs/src/examples.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Examples"><a class="docs-heading-anchor" href="#Examples">Examples</a><a id="Examples-1"></a><a class="docs-heading-anchor-permalink" href="#Examples" title="Permalink"></a></h1><ul><li><a href="../api/#Cluster.KMeans"><code>Cluster.KMeans</code></a></li><li><a href="../api/#Cluster.KMeans-Tuple{}"><code>Cluster.KMeans</code></a></li><li><a href="../api/#Cluster.assign_center-Tuple{Any}"><code>Cluster.assign_center</code></a></li><li><a href="../api/#Cluster.compute_distance-Tuple{Any, Any}"><code>Cluster.compute_distance</code></a></li><li><a href="../api/#Cluster.fit!-Tuple{KMeans, Any}"><code>Cluster.fit!</code></a></li><li><a href="../api/#Cluster.init_centroids-Tuple{Any, Any, Any}"><code>Cluster.init_centroids</code></a></li><li><a href="../api/#Cluster.predict-Tuple{KMeans, Any}"><code>Cluster.predict</code></a></li><li><a href="../api/#Cluster.update_centroids-Tuple{Any, Any, Any}"><code>Cluster.update_centroids</code></a></li></ul><h2 id="Basic-Example"><a class="docs-heading-anchor" href="#Basic-Example">Basic Example</a><a id="Basic-Example-1"></a><a class="docs-heading-anchor-permalink" href="#Basic-Example" title="Permalink"></a></h2><p>Below is a basic usage example of the <code>cluster.jl</code> package. This example demonstrates how to set up and use the package with a dataset that has distinct clusters.</p><pre><code class="language-julia hljs"># Load the Cluster.jl package
+using Cluster
+using Random
+
+# Set the random seed for reproducibility
+Random.seed!(1234)
+
+# Create a simple 30x2 dataset with distinct clusters
+data = vcat(
+    [randn(10, 2) .+ [1 1]; # Cluster 1 around [1, 1]
+        randn(10, 2) .+ [5 5]; # Cluster 2 around [5, 5]
+        randn(10, 2) .+ [9 1]] # Cluster 3 around [9, 1]
+)
+
+# Print the first 3 data points
+println(&quot;Data: &quot;, data[1:3, :])
+
+# Print the shape of the data
+println(&quot;Shape: &quot;, size(data))
+
+# Initialize the clustering algorithm
+model = Cluster.KMeans(k=3, mode=&quot;kmeans&quot;) # also supports &quot;kmeanspp&quot;
+
+# Fit the model to the data
+Cluster.fit!(model, data)
+
+# Print the centroids of the clusters
+println(&quot;Centroids: &quot;, model.centroids)
+
+# Test Data
+test_data = [
+    1.0 1.0; # Cluster 1
+    1.5 2.0; # Cluster 1
+    0.5 1.5; # Cluster 1
+    5.0 5.0; # Cluster 2
+    8.0 9.0; # Cluster 2
+    4.5 5.5; # Cluster 2
+    9.0 1.0  # Cluster 3
+    9.5 1.5  # Cluster 3
+    8.5 1.0  # Cluster 3
+]
+
+println(&quot;Test Data: &quot;, test_data)
+println(&quot;Note: The labels might differ from the original cluster labels due to random initialization.&quot;)
+
+
+# Predict the cluster for each data point
+clusters = Cluster.predict(model, test_data)
+
+# Print the resulting clusters
+println(&quot;Cluster assignments: &quot;, clusters)
+
+# Plot the clusters
+using Plots
+scatter(data[:, 1], data[:, 2], color=model.labels, legend=false)
+scatter!(model.centroids[:, 1], model.centroids[:, 2], color=:red, shape=:star, markersize=10)
+savefig(&quot;simple-cluster.svg&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&quot;/home/runner/work/Cluster.jl/Cluster.jl/docs/build/simple-cluster.svg&quot;</code></pre><p>This is the resulting plot of the clusters: <img src="../simple-cluster.svg" alt/></p><h2 id="Interactive-Example-Notebook"><a class="docs-heading-anchor" href="#Interactive-Example-Notebook">Interactive Example Notebook</a><a id="Interactive-Example-Notebook-1"></a><a class="docs-heading-anchor-permalink" href="#Interactive-Example-Notebook" title="Permalink"></a></h2><p>This mike take some time to load, but you can run the example notebook in your browser by clicking the Binder link below. Here you can play around with generating different datasets and clustering them using the <code>Cluster.jl</code> package. <a href="https://binder.plutojl.org/v0.19.36/open?url=https%253A%252F%252Fraw.githubusercontent.com%252Fviktorlorentz%252FCluster.jl%252Fmain%252Fexamples%252Fnotebook.jl"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"/></a></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../api/">« API</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.5.0 on <span class="colophon-date" title="Monday 1 July 2024 21:16">Monday 1 July 2024</span>. Using Julia version 1.10.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
