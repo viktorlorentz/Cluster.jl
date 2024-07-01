@@ -62,8 +62,8 @@ clusters = Cluster.predict(model, test_data)
 # Print the resulting clusters
 println("Cluster assignments: ", clusters)
 
-# Plot the clusters (requires Plots.jl)
-using Plots
+# Plot the clusters
+using PyPlot # hide
 scatter(data[:, 1], data[:, 2], color=model.labels, legend=false)
 scatter!(model.centroids[:, 1], model.centroids[:, 2], color=:red, shape=:star, markersize=10)
 savefig("simple-cluster.svg")
