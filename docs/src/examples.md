@@ -11,12 +11,6 @@ Below is a basic usage example of the `cluster.jl` package. This example demonst
 
 ```@example
 # Load the Cluster.jl package
-using Pkg
-Pkg.add("Plots")
-Pkg.add("Random")
-Pkg.add(url="https://github.com/viktorlorentz/Cluster.jl")
-Pkg.activate()
-
 using Cluster
 using Random
 
