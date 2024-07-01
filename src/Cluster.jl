@@ -326,11 +326,15 @@ function predict(model::KMeans, X)
     return assign_center(D)
 end
 
+
+
 mutable struct BKMeans
     k::Int
     kmeans::KMeans
     labels::Array{Int,1}
+    centroids::Array{Float64,2}
 end
+
 
 function BKMeans(; k::Int=3, kmeans::KMeans=KMeans(k=2, mode="kmeans"))
     if !isa(k, Int) || k <= 0
@@ -339,12 +343,16 @@ function BKMeans(; k::Int=3, kmeans::KMeans=KMeans(k=2, mode="kmeans"))
     if !isa(kmeans, KMeans)
         throw(ArgumentError("kmeans must be an instance of KMeans"))
     end
-    return BKMeans(k, kmeans, Int[])
+    return BKMeans(k, kmeans, Int[], Array{Float64, 2}(undef, 0, 0))
 end
+
 
 function fit!(model::BKMeans, X)
     if size(X, 1) == 0 || size(X, 2) == 0
         throw(ArgumentError("X must be a non-empty matrix"))
+    end
+    if size(X, 1) <  model.k
+        throw(ArgumentError("X must have at least k elements"))
     end
 
     clusters = [X]
@@ -362,12 +370,19 @@ function fit!(model::BKMeans, X)
         end
     end
     model.labels = []
+    model.centroids = zeros(Float64, size(X, 2), length(clusters))
     for g1 in 1:length(clusters)
+        model.centroids[:, g1] = mean(clusters[g1], dims=1)[:]
         rows, _ = size(clusters[g1])
         for g2 in 1:rows
             push!(model.labels, g1)
         end
     end
+end
+
+function predict(model::BKMeans, X)
+    D = compute_distance(X, model.centroids)
+    return assign_center(D)
 end
 
 end
