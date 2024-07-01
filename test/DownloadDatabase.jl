@@ -1,3 +1,5 @@
+module DownloadDatabase
+
 using LibGit2
 using GZip
 using DelimitedFiles
@@ -7,7 +9,7 @@ folder_name = "test/datasets"
 const datasetPath = joinpath(dirname(@__DIR__), folder_name)
 
 
-function download_data(url, datasetPath)
+function download_data(url, datasetPath, battery, dataset)
     """
     Downloads benchmarking data from Github repository
 
@@ -29,13 +31,13 @@ function download_data(url, datasetPath)
         LibGit2.clone(url, datasetPath)
     # start processing if data exist
     else
-        print("Data exist. Preprocessing... \n")
-        data_preprocessing()
+        #print("Data exist. Preprocessing... \n")
+        data_preprocessing(datasetPath, battery, dataset)
     end
 end
 
 
-function data_preprocessing(dataset_path=datasetPath, battery="wut", dataset="x2")
+function data_preprocessing(dataset_path, battery, dataset)
     """
     Preprocess data and labels from Gzip compressed files
 
@@ -81,9 +83,7 @@ function data_preprocessing(dataset_path=datasetPath, battery="wut", dataset="x2
         error("No label files found for dataset: $dataset")
     end
 
-    return data, labels
+    return data, labels, dataset
+    
 end
-
-
-# download_data("https://github.com/Omadzze/JlData.git", datasetPath)
-# data, lables = data_preprocessing()
+end
