@@ -16,8 +16,10 @@ results = "fast"
 # TODO
 
 println("Results: ", results)
+nothing # hide
 ```
 
 ```@example 1
 #benchmark 2
+nothing # hide
 ```
