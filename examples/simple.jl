@@ -1,15 +1,3 @@
-```@meta
-CurrentModule = Cluster
-```
-# Examples
-
-```@index
-```
-
-## Basic Example
-Below is a basic usage example of the `cluster.jl` package. This example demonstrates how to set up and use the package with a dataset that has distinct clusters.
-
-```@example
 # Load the Cluster.jl package
 using Pkg
 Pkg.add("Plots")
@@ -72,11 +60,4 @@ println("Cluster assignments: ", clusters)
 using Plots
 scatter(data[:, 1], data[:, 2], color=model.labels, legend=false)
 scatter!(model.centroids[:, 1], model.centroids[:, 2], color=:red, shape=:star, markersize=10)
-savefig("simple-cluster.svg")
-```
-This is the resulting plot of the clusters:
-![](simple-cluster.svg)
-
-## Interactive Example Notebook
-This mike take some time to load, but you can run the example notebook in your browser by clicking the Binder link below. Here you can play around with generating different datasets and clustering them using the `Cluster.jl` package.
-[![Binder](https://mybinder.org/badge_logo.svg)](https://binder.plutojl.org/v0.19.36/open?url=https%253A%252F%252Fraw.githubusercontent.com%252Fviktorlorentz%252FCluster.jl%252Fmain%252Fexamples%252Fnotebook.jl)
+savefig("simple-cluster.png")
