@@ -1,3 +1,4 @@
 [deps]
 Cluster = "a199801d-da2f-495f-981e-bf842e0b3fa3"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
