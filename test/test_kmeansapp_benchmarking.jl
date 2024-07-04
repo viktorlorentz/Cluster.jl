@@ -5,8 +5,8 @@ using .Utils
 include("Plotting.jl")
 using .Plotting
 
-@testset "K-means Benchmarking" begin
-    @testset "K-means Basic Functionality Benchmarking" begin
+@testset "K-means++ Benchmarking" begin
+    @testset "K-means++ Basic Functionality Benchmarking" begin
 
         """
         Test for benchmarking K-means algorithm. Calucalates Rand index whether it's above certain threshold.
@@ -22,7 +22,7 @@ using .Plotting
                 train_data, train_labels, test_data, test_labels = split_data(data, labels, TRAIN_TEST_RATIO)
 
                 # Create and fit KMeans model
-                model = KMeans(k=num_classes, mode="kmeans")
+                model = KMeans(k=num_classes, mode="kmeanspp")
 
                 # Suppress and capture any output during fit!
                 fit!(model, train_data)
@@ -37,7 +37,7 @@ using .Plotting
                 # Test if the model converges
                 @test model.centroids != zeros(Float64, 0, 0)
 
-                @testset "Prediction Accuracy for Kmeans" begin
+                @testset "Prediction Accuracy for Kmeans++" begin
                     # check if test data is not empty
                     if num_samples != 1
                         # Predict on test data
@@ -64,7 +64,7 @@ using .Plotting
                         
                         @test ri > RAND_INDEX_THRESHOLD_BENCHMARKING
                         # visualize all predictions
-                        Plotting.visualize_clusters(test_data, test_labels, test_pred_labels, dataset_name, "kmeans-figures")
+                        Plotting.visualize_clusters(test_data, test_labels, test_pred_labels, dataset_name, "kmeansapp-figures")
                     else # single point
                         @test predict(model, test_data) == [1]
                     end

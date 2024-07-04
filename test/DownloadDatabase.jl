@@ -16,6 +16,7 @@ function download_data(url, datasetPath, battery, dataset)
     Args:
         url (string): Url to download benchmark data
         datasetPath (string): Path to store downloaded data
+        battery (string): Specific set from a dataset
 
     Returns:
         It should download data and start data_preprocessing() function

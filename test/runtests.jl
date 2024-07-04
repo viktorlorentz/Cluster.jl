@@ -85,6 +85,10 @@ end
 
 test_benchmark()
 
-@testset "Cluster.jl Benchmarking" begin
+@testset "Kmeans Benchmarking" begin
     include("test_kmeans_benchmarking.jl")
+end
+
+@testset "Kmeans++ Benchmarking" begin
+    include("test_kmeansapp_benchmarking.jl")
 end

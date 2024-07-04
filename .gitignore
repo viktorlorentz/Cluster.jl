@@ -8,6 +8,5 @@
 
 .idea
 
-test/figures
 test/datasets
 test/datasets_test
