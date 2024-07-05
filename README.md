@@ -23,3 +23,6 @@ Pkg.add(url="https://github.com/viktorlorentz/Cluster.jl")
 
 You can find a demo here:\
 [![Binder](https://mybinder.org/badge_logo.svg)](https://binder.plutojl.org/v0.19.36/open?url=https%253A%252F%252Fraw.githubusercontent.com%252Fviktorlorentz%252FCluster.jl%252Fmain%252Fexamples%252Fnotebook.jl)
+\
+This will take up to 7min to load. Alternatively, you can add this URL to your local Pluto instance:\
+https://github.com/viktorlorentz/Cluster.jl/blob/main/examples/notebook.jl
