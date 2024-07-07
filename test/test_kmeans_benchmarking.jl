@@ -10,7 +10,6 @@ using .Plotting
 
         """
         Test for benchmarking K-means algorithm. Calucalates Rand index whether it's above certain threshold.
-        Moreover, it calculates accuracy score and if it's above 80% returns pass to the test
         """
 
         for testCase in testCasesBenchmarking
