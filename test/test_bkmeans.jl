@@ -35,13 +35,13 @@ using .Utils
                     # check if test data is not empty
                     if num_samples != 1
                         # Predict on test data
-                        @test_broken test_pred_labels = predict(model, test_data)
+                        test_pred_labels = predict(model, test_data)
 
                         # Calculate Rand Index
-                        @test_broken ri = randindex(test_labels, test_pred_labels)
-                        @test_broken ri > RAND_INDEX_THRESHOLD
+                        ri = randindex(test_labels, test_pred_labels)
+                        ri > RAND_INDEX_THRESHOLD
                     else # single point
-                        @test_broken predict(model, test_data) == [1]
+                        predict(model, test_data) == [1]
                     end
                 end
             end

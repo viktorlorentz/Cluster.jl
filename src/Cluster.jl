@@ -210,10 +210,16 @@ D = compute_distance(X, centroids)
 ```
 """
 function compute_distance(X, centroids)
+
+    # if size(X, 2) != size(centroids, 2)
+    #     throw(DimensionMismatch("The number of columns in X ($(size(X, 2))) must match the number of columns in centroids ($(size(centroids, 2)))."))
+    # end
     x = size(X)
     y = size(centroids)
     D = zeros(x[1], y[1])
 
+    print(size(X))
+    print(size(centroids))
     for i in 1:y[1]
         for j in 1:x[1]
             D[j, i] = sqrt(sum((X[j, :] .- centroids[i, :]) .^ 2))
@@ -330,6 +336,7 @@ mutable struct BKMeans
     k::Int
     kmeans::KMeans
     labels::Array{Int,1}
+    centroids::Matrix{Float64}
 end
 
 function BKMeans(; k::Int=3, kmeans::KMeans=KMeans(k=2, mode="kmeans"))
@@ -339,7 +346,7 @@ function BKMeans(; k::Int=3, kmeans::KMeans=KMeans(k=2, mode="kmeans"))
     if !isa(kmeans, KMeans)
         throw(ArgumentError("kmeans must be an instance of KMeans"))
     end
-    return BKMeans(k, kmeans, Int[])
+    return BKMeans(k, kmeans, Int[], Array{Float64}(undef, 0, 0))
 end
 
 function fit!(model::BKMeans, X)
@@ -358,16 +365,25 @@ function fit!(model::BKMeans, X)
 
         deleteat!(clusters, i)
         for new_cluster in new_clusters
-            push!(clusters, new_cluster)
+            if size(new_cluster, 1) > 0  # Ensure new cluster is non-empty
+                push!(clusters, new_cluster)
+            end
         end
     end
-    model.labels = []
-    for g1 in 1:length(clusters)
+    model.labels = Int[]
+    model.centroids = zeros(Float64, length(clusters), size(X, 2))
+   ufor g1 in 1:length(clusters)
+        model.centroids[g1 , :] = mean(clusters[g1], dims=1)[:]
         rows, _ = size(clusters[g1])
         for g2 in 1:rows
             push!(model.labels, g1)
         end
     end
+end
+
+function predict(model::BKMeans, X)
+    D = compute_distance(X, model.centroids)
+    return assign_center(D)
 end
 
 end
