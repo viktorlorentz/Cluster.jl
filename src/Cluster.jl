@@ -372,7 +372,7 @@ function fit!(model::BKMeans, X)
     end
     model.labels = Int[]
     model.centroids = zeros(Float64, length(clusters), size(X, 2))
-   ufor g1 in 1:length(clusters)
+    for g1 in 1:length(clusters)
         model.centroids[g1 , :] = mean(clusters[g1], dims=1)[:]
         rows, _ = size(clusters[g1])
         for g2 in 1:rows
