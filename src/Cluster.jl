@@ -7,6 +7,20 @@ using Statistics
 export KMeans, init_centroids, fit!, compute_distance, assign_center, update_centroids, predict, BKMeans
 
 # KMeans definition
+
+"""
+KMeans Clustering Algorithm
+
+- Initializes centroids using either random selection or KMeans++.
+- Iteratively assigns points to the nearest centroid.
+- Updates centroids based on the mean of assigned points.
+- Stops when centroids converge or after a maximum number of iterations.
+
+References:
+- [Scikit-Learn KMeans Documentation](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html)
+"""
+
+
 """
     mutable struct KMeans
 
@@ -21,6 +35,7 @@ A structure representing a KMeans clustering model.
 - `labels::Array{Int,1}`: The labels assigned to each data point.
 
 """
+
 mutable struct KMeans
     k::Int
     mode::String
@@ -330,12 +345,37 @@ function predict(model::KMeans, X)
     return assign_center(D)
 end
 
+
+
+"""
+Bisecting KMeans Clustering Algorithm
+
+- Starts with a single cluster containing all data points.
+- Recursively splits clusters based on the highest SSE until `k` clusters are obtained.
+- Uses standard KMeans for cluster splitting.
+
+References:
+- [Bisecting KMeans: An Improved Version of KMeans](https://en.wikipedia.org/wiki/K-means_clustering#Bisecting_K-means)
+"""
 mutable struct BKMeans
     k::Int
     kmeans::KMeans
     labels::Array{Int,1}
     centroids::Matrix{Float64}
 end
+
+"""
+    BKMeans(; k::Int=3, kmeans::KMeans=KMeans(k=2, mode="kmeans"))
+
+Creates a new BKMeans clustering model.
+
+Keyword Arguments:
+- `k::Int`: The number of clusters (default: 3).
+- `kmeans::KMeans`: An instance of the KMeans model used for cluster splitting (default: KMeans with 2 clusters).
+
+Returns:
+A `BKMeans` model with the specified parameters.
+"""
 
 function BKMeans(; k::Int=3, kmeans::KMeans=KMeans(k=2, mode="kmeans"))
     if !isa(k, Int) || k <= 0
@@ -346,6 +386,16 @@ function BKMeans(; k::Int=3, kmeans::KMeans=KMeans(k=2, mode="kmeans"))
     end
     return BKMeans(k, kmeans, Int[], Array{Float64}(undef, 0, 0))
 end
+
+"""
+    fit!(model::BKMeans, X)
+
+Runs the Bisecting KMeans algorithm for the given data and model.
+
+Arguments:
+- `model::BKMeans`: The BKMeans model to be trained.
+- `X`: The input data matrix where each row is a data point.
+"""
 
 function fit!(model::BKMeans, X)
     if size(X, 1) == 0 || size(X, 2) == 0
@@ -379,6 +429,18 @@ function fit!(model::BKMeans, X)
     end
 end
 
+"""
+    predict(model::BKMeans, X) -> Array
+
+Returns the cluster labels for the given data points using the trained BKMeans model.
+
+Arguments:
+- `model::BKMeans`: The trained BKMeans model.
+- `X::Array{Float64,2}`: The input data matrix where each row is a data point.
+
+Returns:
+An array of cluster labels for each data point.
+"""
 function predict(model::BKMeans, X)
     D = compute_distance(X, model.centroids)
     return assign_center(D)
