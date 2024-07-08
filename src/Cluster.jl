@@ -218,8 +218,6 @@ function compute_distance(X, centroids)
     y = size(centroids)
     D = zeros(x[1], y[1])
 
-    print(size(X))
-    print(size(centroids))
     for i in 1:y[1]
         for j in 1:x[1]
             D[j, i] = sqrt(sum((X[j, :] .- centroids[i, :]) .^ 2))
