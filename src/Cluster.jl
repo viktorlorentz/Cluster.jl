@@ -4,7 +4,7 @@ using Random
 using LinearAlgebra
 using Statistics
 
-export KMeans, init_centroids, fit!, compute_distance, assign_center, update_centroids, predict, BKMeans
+export KMeans, init_centroids, fit!, compute_distance, assign_center, update_centroids, predict, BKMeans, DC
 
 # KMeans definition
 """
@@ -104,7 +104,7 @@ function init_centroids(X::Matrix{Float64}, K, mode)
         permutation = randperm(row)
         idx = permutation[1:K]
         centroids = X[idx, :]
-    
+
     elseif mode =="dc"
         # Generate random vector with the length of the data, then choose first K values
         row, col = size(X)
@@ -224,7 +224,7 @@ function compute_distance(X::Matrix{Float64}, centroids::Matrix{Float64})
     for (i, centroid) in enumerate(eachrow(centroids))
         for (j, x_row) in enumerate(eachrow(X))
 
-    
+
             D[j, i] = sqrt(sum((X[j, :] .- centroids[i, :]) .^ 2))
         end
     end
@@ -394,48 +394,79 @@ mutable struct DC
     centroids::Array{Float64,2}
     labels::Array{Int,1}
 end
+# Constructor
+"""
+    DC(; k::Int=3, mode::Symbol=:kmeans, max_try::Int=100, tol::Float64=1e-4) -> dc
+
+    Creates a new DC clustering model.
+
+    # Keyword Arguments
+    - `k::Int`: The number of clusters (default: 3).
+    - `mode::Symbol`: The mode of initialization (`:kmeans` or `:kmeans++`, default: `:kmeans`).
+    - `max_try::Int`: The maximum number of iterations for the algorithm (default: 100).
+    - `tol::Float64`: The tolerance for convergence (default: 1e-4).
+
+    # Returns
+    A `DC` model with the specified parameters.
+
+"""
+function DC(; k::Int=3, mode::String="dc", max_try::Int=100, tol::Float64=1e-4)
+    if !isa(k, Int) || k <= 0
+        throw(ArgumentError("k must be a positive integer"))
+    end
+    if !isa(max_try, Int) || max_try <= 0
+        throw(ArgumentError("max_try must be a positive integer"))
+    end
+    if !isa(tol, Float64) || tol <= 0
+        throw(ArgumentError("tol must be a positive number"))
+    end
+    if mode != "kmeans" && mode != "kmeanspp" && mode != "dc"
+        throw(ArgumentError("mode must be either 'kmeans' or 'kmeanspp'"))
+    end
+    return DC(k, mode, max_try, tol, zeros(Float64, 0, 0), Int[])
+end
 
 """
     compute_objective_function(data, centroids,k) -> Array
 
-Computes the distance from each data point to each centroid.
+    Computes the distance from each data point to each centroid.
 
-# Arguments
-- `data`: The input data matrix where each row is a data point.
-- `centroids`: The current centroids.
-- `k` the exponent of norm 
-# Returns
-A distance matrix `D` of size (number of data points, number of centroids), where `D[i, j]` is the distance from data point `i` to centroid `j`.
+    # Arguments
+    - `data`: The input data matrix where each row is a data point.
+    - `centroids`: The current centroids.
+    - `k` the exponent of norm
+    # Returns
+    A distance matrix `D` of size (number of data points, number of centroids), where `D[i, j]` is the distance from data point `i` to centroid `j`.
 
-# Examples
-```julia-repl
-X = [
-    1.0 1.0;
-    1.5 2.0;
-    3.0 4.0
-]
-centroids = [
-    1.0 1.0;
-    3.0 4.0
-]
-D = compute_distance(X, centroids)
-```
+    # Examples
+    ```julia-repl
+    X = [
+        1.0 1.0;
+        1.5 2.0;
+        3.0 4.0
+    ]
+    centroids = [
+        1.0 1.0;
+        3.0 4.0
+    ]
+    D = compute_distance(X, centroids)
+    ```
 """
 function compute_objective_function(X::Matrix{Float64}, centroids::Matrix{Float64},k)
     x = size(X)
     y = size(centroids)
     D = zeros(x[1], y[1])
     delta = 0.0001
-    
+
     ##if k = 2 the clustering criterion is the same as k means
 
-    
+
     for (i, centroid) in enumerate(eachrow(centroids))
         for (j, x_row) in enumerate(eachrow(X))
             D[j, i] = sqrt(sum((x_row .- centroid) .^ k .+ delta))
         end
     end
-    
+
     return D
 
 end
@@ -469,18 +500,18 @@ new_centroids = update_centroids(X, labels, model)
 function update_centroids_dc(X::Matrix{Float64}, label_vector::Vector{Int64}, model)
     δ = 0.0001
     new_centers = zeros(model.k, size(X, 2))
-    
+
     for i in 1:model.k
-        
+
         # Mask for selecting points belonging to the i-th cluster
         mask = label_vector .== i
-        
+
         # Points in the i-th cluster
         cluster_points = X[mask, :]
-        
+
         # Number of points in the i-th cluster
         num_points = size(cluster_points, 1)
-        
+
         # If no points are assigned to the cluster, skip the update
         if num_points == 0
             continue
@@ -490,20 +521,20 @@ function update_centroids_dc(X::Matrix{Float64}, label_vector::Vector{Int64}, mo
         log_potentials = zeros(num_points)
         for j in 1:num_points
             d = cluster_points[j, :]
-            
+
             temp = (cluster_points.-transpose(d)).^2
-            
+
             temp2 = sum(temp,dims=2).+δ
- 
+
             log_potential = sum(log.(temp2))
-    
+
             log_potentials[j] = log_potential
         end
-        
+
         # Find the point with the minimum log-potential
         min_index = argmin(log_potentials)
         new_centers[i, :] = cluster_points[min_index, :]
-        
+
     end
 
     return new_centers
@@ -535,23 +566,25 @@ X = [
 fit!(model, X)
 ```
 """
-function fit!(model::DC, X::Matrix{Float64},k)
-    
+function fit!(model::DC, X::Matrix{Float64})
+
+    k = model.k
+
     if size(X, 1) == 0 || size(X, 2) == 0
         throw(ArgumentError("X must be a non-empty matrix"))
     end
-    
+
     model.centroids = init_centroids(X, model.k, model.mode)
 
     for i in 1:model.max_try
-        
+
         D = compute_objective_function(X, model.centroids,k)
-        
+
         model.labels = assign_center(D)
-        
+
         new_centroids = update_centroids_dc(X, model.labels, model)
 
-        
+
         for j in 1:model.k
             if !(j in model.labels)
                 new_centroids[j, :] = X[rand(1:size(X, 1)), :]
@@ -561,9 +594,9 @@ function fit!(model::DC, X::Matrix{Float64},k)
         if maximum(sqrt.(sum((model.centroids .- new_centroids) .^ 2, dims=2))) < model.tol
             break
         end
-        
+
         model.centroids = new_centroids
-        
+
     end
 
 end
@@ -606,57 +639,5 @@ function predict(model::DC,X::Matrix{Float64})
     D = compute_objective_function(X, model.centroids,2)
     return assign_center(D)
 end
-
-data_1 = [
-    # Cluster 1
-    1.0 1.0 1.0;
-    1.5 2.0 1.7;
-    # 1.3 1.8;
-    # 1.2 1.2;
-    # 0.8 0.9;
-    # 1.0 1.1;
-    # 1.3 1.3;
-    # 1.2 1.3;
-    # 1.3 1.4;
-    # 1.5 1.5;
-    
-    # Cluster 2
-    5.0 7.0 6.0;
-    5.5 7.5 6.0;
-    # 6.0 7.0;
-    # 5.8 7.2;
-    # 6.2 7.5;
-    # 5.9 6.8;
-    # 5.6 7.1;
-    # 6.3 7.6;
-    # 5.8 6.7;
-    # 5.8 7.7;
-    
-    # Cluster 3
-    8.0 1.0 8.0;
-    8.5 1.5 1.5;
-    # 8.3 1.2;
-    # 8.7 1.8;
-    # 8.4 1.4;
-    # 8.1 1.1;
-    # 8.6 1.6;
-    # 8.4 1.3;
-    # 8.3 1.5;
-    # 8.6 1.8
-]
-
-
-K = DC(3, "dc",20,1e-4,zeros(Float64, 0, 0), Int[])
-
-K2 =KMeans(k=3, mode="kmeans")
-
-K3 = BKMeans()
-
-fit!(K2,data_1)
-print(predict(K2,[1.5 2.0 1.0]))
-
-fit!(K,data_1,2)
-
-print(predict(K,[1.5 2.0 1.0]))
 
 end
