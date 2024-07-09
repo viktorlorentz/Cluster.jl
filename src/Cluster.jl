@@ -90,7 +90,7 @@ mode = :kmeans
 centroids = init_centroids(X, K, mode)
 ```
 """
-function init_centroids(X, K, mode)
+function init_centroids(X::Matrix{Float64}, K, mode)
     if !isa(K, Int) || K <= 0
         throw(ArgumentError("K must be a positive integer"))
     end
@@ -165,7 +165,7 @@ X = [
 fit!(model, X)
 ```
 """
-function fit!(model::KMeans, X)
+function fit!(model::KMeans, X::Matrix{Float64})
     if size(X, 1) == 0 || size(X, 2) == 0
         throw(ArgumentError("X must be a non-empty matrix"))
     end
@@ -216,13 +216,15 @@ centroids = [
 D = compute_distance(X, centroids)
 ```
 """
-function compute_distance(X, centroids)
+function compute_distance(X::Matrix{Float64}, centroids::Matrix{Float64})
     x = size(X)
     y = size(centroids)
     D = zeros(x[1], y[1])
 
-    for i in 1:y[1]
-        for j in 1:x[1]
+    for (i, centroid) in enumerate(eachrow(centroids))
+        for (j, x_row) in enumerate(eachrow(X))
+
+    
             D[j, i] = sqrt(sum((X[j, :] .- centroids[i, :]) .^ 2))
         end
     end
@@ -250,8 +252,10 @@ D = [
 labels = assign_center(D)
 ```
 """
-function assign_center(D)
-    return [argmin(D[i, :]) for i in 1:size(D, 1)]
+function assign_center(D::Matrix{Float64})
+
+    #return [argmin(D[i, :]) for i in 1:size(D, 1)]
+    return [argmin(row) for row in eachrow(D)]
 end
 
 """
@@ -280,7 +284,7 @@ model = KMeans(k=2)
 new_centroids = update_centroids(X, labels, model)
 ```
 """
-function update_centroids(X, label_vector, model)
+function update_centroids(X::Matrix{Float64}, label_vector::Vector{Int64}, model)
     r, c = size(X)
     centroids = zeros(model.k, c)
 
@@ -328,7 +332,7 @@ fit!(model, data)
 labels = predict(model, test_data)
 ```
 """
-function predict(model::KMeans, X)
+function predict(model::KMeans, X::Matrix{Float64})
     D = compute_distance(X, model.centroids)
     return assign_center(D)
 end
@@ -349,7 +353,7 @@ function BKMeans(; k::Int=3, kmeans::KMeans=KMeans(k=2, mode="kmeans"))
     return BKMeans(k, kmeans, Int[])
 end
 
-function fit!(model::BKMeans, X)
+function fit!(model::BKMeans, X::Matrix{Float64})
     if size(X, 1) == 0 || size(X, 2) == 0
         throw(ArgumentError("X must be a non-empty matrix"))
     end
@@ -357,7 +361,8 @@ function fit!(model::BKMeans, X)
     clusters = [X]
 
     while length(clusters) < model.k
-        sse = [sum(compute_distance(clusters[i], mean(clusters[i], dims=1)) .^ 2) for i in 1:length(clusters)]
+        #sse = [sum(compute_distance(clusters[i], mean(clusters[i], dims=1)) .^ 2) for i in 1:length(clusters)]
+        sse = [sum(compute_distance(clusters[i], mean(clusters[i], dims=1)) .^ 2) for (i,value) in enumerate(eachrow(clusters))]
         i = argmax(sse)
         sub_model = deepcopy(model.kmeans)
         fit!(sub_model, clusters[i])
@@ -369,9 +374,11 @@ function fit!(model::BKMeans, X)
         end
     end
     model.labels = []
-    for g1 in 1:length(clusters)
-        rows, _ = size(clusters[g1])
-        for g2 in 1:rows
+    #for g1 in 1:length(clusters)
+    for (g1,v1) in enumerate(eachrow(clusters))
+        #rows, _ = size(clusters[g1])
+        #for g2 in 1:rows
+        for (g2,v2) in enumerate(eachrow(clusters))
             push!(model.labels, g1)
         end
     end
@@ -414,7 +421,7 @@ centroids = [
 D = compute_distance(X, centroids)
 ```
 """
-function compute_objective_function(X, centroids,k)
+function compute_objective_function(X::Matrix{Float64}, centroids::Matrix{Float64},k)
     x = size(X)
     y = size(centroids)
     D = zeros(x[1], y[1])
@@ -422,12 +429,13 @@ function compute_objective_function(X, centroids,k)
     
     ##if k = 2 the clustering criterion is the same as k means
 
-    for i in 1:y[1]
-        for j in 1:x[1]
-            D[j, i] = sqrt(sum((X[j, :] .- centroids[i, :]) .^ k .+ delta))
+    
+    for (i, centroid) in enumerate(eachrow(centroids))
+        for (j, x_row) in enumerate(eachrow(X))
+            D[j, i] = sqrt(sum((x_row .- centroid) .^ k .+ delta))
         end
     end
-
+    
     return D
 
 end
@@ -458,10 +466,9 @@ model = KMeans(k=2)
 new_centroids = update_centroids(X, labels, model)
 ```
 """
-function update_centroids_dc(X, label_vector, model)
-    k = 3
+function update_centroids_dc(X::Matrix{Float64}, label_vector::Vector{Int64}, model)
     δ = 0.0001
-    new_centers = zeros(k, size(X, 2))
+    new_centers = zeros(model.k, size(X, 2))
     
     for i in 1:model.k
         
@@ -504,17 +511,19 @@ function update_centroids_dc(X, label_vector, model)
 end
 
 """
-    fit!(model::KMeans, X)
+    fit!(model::DC, X)
 
-Runs the KMeans algorithm for the given data and model.
+Runs the Distributional Clustering algorithm for the given data and model.
 
 # Arguments
-- `model::KMeans`: The KMeans model to be trained.
+- `model::DC`: The DC model to be trained.
 - `X`: The input data matrix where each row is a data point.
+- `k`: Exponent of the norm
 
 # Examples
 ```julia-repl
-model = KMeans(k=3, mode=:kmeans)
+
+model = DC(3, "dc",20,1e-4,zeros(Float64, 0, 0), Int[])
 X = [
     1.0 1.0;
     1.5 2.0;
@@ -526,7 +535,7 @@ X = [
 fit!(model, X)
 ```
 """
-function fit_dc!(model, X,k)
+function fit!(model::DC, X::Matrix{Float64},k)
     
     if size(X, 1) == 0 || size(X, 2) == 0
         throw(ArgumentError("X must be a non-empty matrix"))
@@ -593,9 +602,61 @@ fit!(model, data)
 labels = predict(model, test_data)
 ```
 """
-function predict(model::DC,X)
+function predict(model::DC,X::Matrix{Float64})
     D = compute_objective_function(X, model.centroids,2)
     return assign_center(D)
 end
+
+data_1 = [
+    # Cluster 1
+    1.0 1.0 1.0;
+    1.5 2.0 1.7;
+    # 1.3 1.8;
+    # 1.2 1.2;
+    # 0.8 0.9;
+    # 1.0 1.1;
+    # 1.3 1.3;
+    # 1.2 1.3;
+    # 1.3 1.4;
+    # 1.5 1.5;
+    
+    # Cluster 2
+    5.0 7.0 6.0;
+    5.5 7.5 6.0;
+    # 6.0 7.0;
+    # 5.8 7.2;
+    # 6.2 7.5;
+    # 5.9 6.8;
+    # 5.6 7.1;
+    # 6.3 7.6;
+    # 5.8 6.7;
+    # 5.8 7.7;
+    
+    # Cluster 3
+    8.0 1.0 8.0;
+    8.5 1.5 1.5;
+    # 8.3 1.2;
+    # 8.7 1.8;
+    # 8.4 1.4;
+    # 8.1 1.1;
+    # 8.6 1.6;
+    # 8.4 1.3;
+    # 8.3 1.5;
+    # 8.6 1.8
+]
+
+
+K = DC(3, "dc",20,1e-4,zeros(Float64, 0, 0), Int[])
+
+K2 =KMeans(k=3, mode="kmeans")
+
+K3 = BKMeans()
+
+fit!(K2,data_1)
+print(predict(K2,[1.5 2.0 1.0]))
+
+fit!(K,data_1,2)
+
+print(predict(K,[1.5 2.0 1.0]))
 
 end
