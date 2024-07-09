@@ -39,9 +39,9 @@ using .Utils
 
                         # Calculate Rand Index
                         ri = randindex(test_labels, test_pred_labels)
-                        ri > RAND_INDEX_THRESHOLD
+                        @test ri > RAND_INDEX_THRESHOLD
                     else # single point
-                        predict(model, test_data) == [1]
+                        @test predict(model, test_data) == [1]
                     end
                 end
             end
