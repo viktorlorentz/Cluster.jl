@@ -92,3 +92,7 @@ end
 @testset "Kmeans++ Benchmarking" begin
     include("test_kmeansapp_benchmarking.jl")
 end
+
+@testset "BKmeans Benchmarking" begin
+    include("test_bkmeans_benchmarking.jl")
+end

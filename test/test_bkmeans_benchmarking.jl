@@ -42,7 +42,7 @@ using .Plotting
                     # check if test data is not empty
                     if num_samples != 1
                         # Predict on test data
-                        @test_broken test_pred_labels = predict(model, test_data)
+                        test_pred_labels = predict(model, test_data)
 
                         # Remap predicted labels
                         # Note: If we will get accuracy of 0 percent probably our remapping works incorrectly
@@ -53,7 +53,7 @@ using .Plotting
                         remap_pred_labels = map(x -> label_mapping[x], test_pred_labels)
 
                         # Calculate Rand Index
-                        @test_broken ri = randindex(test_labels, remap_pred_labels)
+                        ri = randindex(test_labels, remap_pred_labels)
                         println("Test Case: $(testCase.name), Rand Index: $ri")
 
                         # Calculate accuracy
@@ -63,11 +63,11 @@ using .Plotting
                         # if accuracy above value then our test was passed
                         @test accuracy >= ACCURACY_SCORE
                         
-                        @test_broken ri > RAND_INDEX_THRESHOLD_BENCHMARKING
+                        @test ri > RAND_INDEX_THRESHOLD_BENCHMARKING
                         # visualize all predictions
                         Plotting.visualize_clusters(test_data, test_labels, test_pred_labels, dataset_name, "bkmeans-figures")
                     else # single point
-                        @test_broken predict(model, test_data) == [1]
+                        @test predict(model, test_data) == [1]
                     end
                 end
             end
