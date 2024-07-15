@@ -5,7 +5,7 @@ This module contains utility functions that are used by the clustering algorithm
 """
 
 """
-$(TYPEDEF)
+
 
 Initialize centroids for the chosen algorithm.
 
@@ -15,7 +15,7 @@ Initialize centroids for the chosen algorithm.
 - `mode::Symbol`: The mode of initialization (`:kmeans` or `:kmeans++`).
 
 ## Fields
-$(TYPEDFIELDS)
+
 
 # Examples
 ```@repl
