@@ -1,9 +1,3 @@
-"""
-## Distributional Clustering Method
-
-References:
-- [Krishna, A., Mak, S. and Joseph, R., 2019. Distributional clustering: A distribution-preserving clustering method. arXiv preprint arXiv:1911.05940](https://arxiv.org/abs/1911.05940)
-"""
 
 mutable struct DC
     k::Int
