@@ -239,9 +239,7 @@ function compute_distance(X::Matrix{Float64}, centroids::Matrix{Float64})
 
     for (i, centroid) in enumerate(eachrow(centroids))
         for (j, x_row) in enumerate(eachrow(X))
-
-
-            D[j, i] = sqrt(sum((X[j, :] .- centroids[i, :]) .^ 2))
+            D[j, i] = sqrt(sum((x_row .- centroid) .^ 2))
         end
     end
     return D
@@ -269,8 +267,6 @@ labels = assign_center(D)
 ```
 """
 function assign_center(D::Matrix{Float64})
-
-    #return [argmin(D[i, :]) for i in 1:size(D, 1)]
     return [argmin(row) for row in eachrow(D)]
 end
 
@@ -413,7 +409,7 @@ function fit!(model::BKMeans, X::Matrix{Float64})
     clusters = [X]
 
     while length(clusters) < model.k
-        sse = [sum(compute_distance(clusters[i], mean(clusters[i], dims=1)) .^ 2) for i in 1:length(clusters)]
+        sse = [sum(compute_distance(clusters[i], mean(clusters[i], dims=1)) .^ 2) for i in eachindex(clusters)]
         i = argmax(sse)
         sub_model = deepcopy(model.kmeans)
         fit!(sub_model, clusters[i])
@@ -428,10 +424,10 @@ function fit!(model::BKMeans, X::Matrix{Float64})
     end
     model.labels = Int[]
     model.centroids = zeros(Float64, length(clusters), size(X, 2))
-    for g1 in 1:length(clusters)
+    for g1 in eachindex(clusters)
         model.centroids[g1 , :] = mean(clusters[g1], dims=1)[:]
         rows, _ = size(clusters[g1])
-        for g2 in 1:rows
+        for _ in 1:rows
             push!(model.labels, g1)
         end
     end
