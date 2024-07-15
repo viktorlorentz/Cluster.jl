@@ -124,7 +124,7 @@ $(@bind seed Slider(0:1000000, default=123, show_value=true))\
 Samples per class:\
 $(@bind num_samples_per_class Slider(5:200, default=20, show_value=true))\
 Features/ Dimensions:\
-$(@bind num_features Slider(1:4 , default=2, show_value=true))\
+$(@bind num_features Slider(1:2 , default=2, show_value=true))\
 Classes:\
 $(@bind num_classes Slider(1:25 , default=3, show_value=true))\
 Spread of cluster:\
