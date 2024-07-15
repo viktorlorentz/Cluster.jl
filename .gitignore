@@ -8,6 +8,6 @@
 
 .idea
 
-acttest/datasets
+test/datasets
 test/datasets_test
 test/simple-cluster.png
