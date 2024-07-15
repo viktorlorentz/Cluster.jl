@@ -1,15 +1,3 @@
-
-
-"""
-Bisecting KMeans Clustering Algorithm
-
-- Starts with a single cluster containing all data points.
-- Recursively splits clusters based on the highest SSE until `k` clusters are obtained.
-- Uses standard KMeans for cluster splitting.
-
-References:
-- [Bisecting KMeans: An Improved Version of KMeans](https://en.wikipedia.org/wiki/K-means_clustering#Bisecting_K-means)
-"""
 mutable struct BKMeans
     k::Int
     kmeans::KMeans

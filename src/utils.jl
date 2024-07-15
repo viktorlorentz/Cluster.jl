@@ -1,8 +1,4 @@
-"""
-## Utility functions
 
-This module contains utility functions that are used by the clustering algorithms.
-"""
 
 """
 

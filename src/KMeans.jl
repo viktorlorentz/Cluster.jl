@@ -1,16 +1,3 @@
-
-"""
-## KMeans Clustering Algorithm
-
-- Initializes centroids using either random selection or KMeans++.
-- Iteratively assigns points to the nearest centroid.
-- Updates centroids based on the mean of assigned points.
-- Stops when centroids converge or after a maximum number of iterations.
-
-References:
-- [Scikit-Learn KMeans Documentation](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html)
-"""
-
 """
     mutable struct KMeans
 
