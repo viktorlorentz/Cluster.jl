@@ -521,14 +521,14 @@ end
     D = compute_distance(X, centroids)
     ```
 """
-function compute_objective_function(X::Matrix{Float64}, centroids::Matrix{Float64},k; delta = 0.0001)
+function compute_objective_function(X::Matrix{Float64}, centroids::Matrix{Float64};p = 2, delta = 0.0001)
     x = size(X)
     y = size(centroids)
     D = zeros(x[1], y[1])
 
     for (i, centroid) in enumerate(eachrow(centroids))
         for (j, x_row) in enumerate(eachrow(X))
-            D[j, i] = sqrt(sum((x_row .- centroid) .^ k .+ delta))
+            D[j, i] = sqrt(sum(abs.(x_row .- centroid) .^ p .+ delta))
         end
     end
     return D
@@ -618,7 +618,7 @@ function fit!(model::DC, X::Matrix{Float64})
 
     for i in 1:model.max_try
 
-        D = compute_objective_function(X, model.centroids,model.k)
+        D = compute_objective_function(X, model.centroids)
 
         model.labels = assign_center(D)
         new_centroids = update_centroids(X, model.labels, model)
@@ -669,7 +669,7 @@ labels = predict(model, test_data)
 ```
 """
 function predict(model::DC,X::Matrix{Float64})
-    D = compute_objective_function(X, model.centroids,2)
+    D = compute_objective_function(X, model.centroids)
     return assign_center(D)
 end
 
