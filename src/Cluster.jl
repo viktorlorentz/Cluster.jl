@@ -3,7 +3,6 @@ module Cluster
 using Random
 using LinearAlgebra
 using Statistics
-using DocStringExtensions
 
 include("utils.jl")
 include("KMeans.jl")
