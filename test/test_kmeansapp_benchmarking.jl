@@ -52,15 +52,15 @@ using .Plotting
 
                         # Calculate Rand Index
                         ri = randindex(test_labels, remap_pred_labels)
-                        println("Test Case: $(testCase.name), Rand Index: $ri")
+                        #println("Test Case: $(testCase.name), Rand Index: $ri")
 
                         # Calculate accuracy
                         accuracy = sum(remap_pred_labels .== test_labels) / length(test_labels)
-                        println("Test Case: $(testCase.name), Accuracy: $accuracy")
+                        #println("Test Case: $(testCase.name), Accuracy: $accuracy")
 
                         # if accuracy above value then our test was passed
                         @test accuracy >= ACCURACY_SCORE
-                        
+
                         @test ri > RAND_INDEX_THRESHOLD_BENCHMARKING
                         # visualize all predictions
                         Plotting.visualize_clusters(test_data, test_labels, test_pred_labels, dataset_name, "kmeansapp-figures")

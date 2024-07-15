@@ -106,7 +106,7 @@ mode = :kmeans
 centroids = init_centroids(X, K, mode)
 ```
 """
-function init_centroids(X::Matrix{Float64}, K, mode)
+function init_centroids(X::Matrix{Float64}, K::Int64, mode::String)
     if !isa(K, Int) || K <= 0
         throw(ArgumentError("K must be a positive integer"))
     end
