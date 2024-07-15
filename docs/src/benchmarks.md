@@ -33,6 +33,7 @@ For benchmark our project we used the dataset provided by [Marek Gagolewski](htt
 
 
 ## Visualization K-means
+```@raw html
 <div style="text-align: center;">
   <img src="https://github.com/viktorlorentz/Cluster.jl/blob/benchmarking_alg/test/kmeans-figures/circles.png" alt="Clustering Circles">
   <p>Figure 1: Clustering Circles with K-means</p>
@@ -57,3 +58,4 @@ For benchmark our project we used the dataset provided by [Marek Gagolewski](htt
   <img src="https://github.com/viktorlorentz/Cluster.jl/blob/benchmarking_alg/test/kmeans-figures/trajectories.png" alt="Mk1">
   <p>Figure 5: Trajectories with K-means</p>
 </div>
+```
