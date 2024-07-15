@@ -55,3 +55,9 @@ References:
 Modules = [Cluster]
 Pages = ["DC.jl"]
 ```
+
+## Full list of available functions
+
+```@autodocs
+Modules = [Cluster]
+```
