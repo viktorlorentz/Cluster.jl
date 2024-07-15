@@ -13,6 +13,7 @@ Depth = 5
 All functions used by all algorithms.
 
 ```@autodocs
+Modules = [Cluster]
 Pages = ["utils.jl"]
 ```
 
@@ -27,6 +28,7 @@ References:
 - [Scikit-Learn KMeans Documentation](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html)
 
 ```@autodocs
+Modules = [Cluster]
 Pages = ["KMeans.jl"]
 ```
 
@@ -40,6 +42,7 @@ References:
 - [Bisecting KMeans: An Improved Version of KMeans](https://en.wikipedia.org/wiki/K-means_clustering#Bisecting_K-means)
 
 ```@autodocs
+Modules = [Cluster]
 Pages = ["BKMeans.jl"]
 ```
 
@@ -49,5 +52,6 @@ References:
 - [Krishna, A., Mak, S. and Joseph, R., 2019. Distributional clustering: A distribution-preserving clustering method. arXiv preprint arXiv:1911.05940](https://arxiv.org/abs/1911.05940)
 
 ```@autodocs
+Modules = [Cluster]
 Pages = ["DC.jl"]
 ```
