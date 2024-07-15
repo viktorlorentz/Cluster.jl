@@ -54,6 +54,10 @@ testCases = [
         include("test_dc.jl")
         include("test_functions.jl")
     end
+
+    @testset "Test examples" begin
+        include("test_examples.jl")
+    end
     @testset "Benchmarking" begin
         include("benchmarking.jl")
     end
