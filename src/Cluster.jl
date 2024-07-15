@@ -36,6 +36,7 @@ A structure representing a KMeans clustering model.
 
 """
 
+
 mutable struct KMeans
     k::Int
     mode::String

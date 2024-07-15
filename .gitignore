@@ -6,5 +6,7 @@
 /docs/build/
 .DS_Store
 
+.idea
+
 test/datasets
 test/datasets_test
