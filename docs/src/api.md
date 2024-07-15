@@ -57,6 +57,8 @@ Pages = ["DC.jl"]
 ```
 
 ## Full list of available functions
+```@index
+```
 
 ```@autodocs
 Modules = [Cluster]
