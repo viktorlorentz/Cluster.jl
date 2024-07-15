@@ -457,7 +457,7 @@ end
 
 mutable struct DC
     k::Int
-    mode
+    mode::String
     max_try::Int
     tol::Float64
     centroids::Array{Float64,2}
@@ -490,7 +490,7 @@ function DC(; k::Int=3, mode::String="dc", max_try::Int=100, tol::Float64=1e-4)
         throw(ArgumentError("tol must be a positive number"))
     end
     if mode != "kmeans" && mode != "kmeanspp" && mode != "dc"
-        throw(ArgumentError("mode must be either 'kmeans' or 'kmeanspp'"))
+        throw(ArgumentError("mode must be either 'kmeans', 'kmeanspp', or 'dc'"))
     end
     return DC(k, mode, max_try, tol, zeros(Float64, 0, 0), Int[])
 end
@@ -521,23 +521,17 @@ end
     D = compute_distance(X, centroids)
     ```
 """
-function compute_objective_function(X::Matrix{Float64}, centroids::Matrix{Float64},k)
+function compute_objective_function(X::Matrix{Float64}, centroids::Matrix{Float64},k; delta = 0.0001)
     x = size(X)
     y = size(centroids)
     D = zeros(x[1], y[1])
-    delta = 0.0001
-
-    ##if k = 2 the clustering criterion is the same as k means
-
 
     for (i, centroid) in enumerate(eachrow(centroids))
         for (j, x_row) in enumerate(eachrow(X))
             D[j, i] = sqrt(sum((x_row .- centroid) .^ k .+ delta))
         end
     end
-
     return D
-
 end
 
 """
@@ -566,48 +560,28 @@ model = KMeans(k=2)
 new_centroids = update_centroids(X, labels, model)
 ```
 """
-function update_centroids_dc(X::Matrix{Float64}, label_vector::Vector{Int64}, model)
-    δ = 0.0001
+function update_centroids(X::Matrix{Float64}, label_vector::Vector{Int64}, model::DC; delta = 0.0001)
+
     new_centers = zeros(model.k, size(X, 2))
-
     for i in 1:model.k
-
-        # Mask for selecting points belonging to the i-th cluster
         mask = label_vector .== i
-
-        # Points in the i-th cluster
         cluster_points = X[mask, :]
-
-        # Number of points in the i-th cluster
         num_points = size(cluster_points, 1)
-
-        # If no points are assigned to the cluster, skip the update
         if num_points == 0
             continue
         end
-
-        # Compute the log-potential for each point in the cluster
         log_potentials = zeros(num_points)
         for j in 1:num_points
             d = cluster_points[j, :]
-
-            temp = (cluster_points.-transpose(d)).^2
-
-            temp2 = sum(temp,dims=2).+δ
-
+            temp = (cluster_points .- transpose(d)).^2
+            temp2 = sum(temp, dims=2) .+ delta
             log_potential = sum(log.(temp2))
-
             log_potentials[j] = log_potential
         end
-
-        # Find the point with the minimum log-potential
         min_index = argmin(log_potentials)
         new_centers[i, :] = cluster_points[min_index, :]
-
     end
-
     return new_centers
-
 end
 
 """
@@ -636,9 +610,6 @@ fit!(model, X)
 ```
 """
 function fit!(model::DC, X::Matrix{Float64})
-
-    k = model.k
-
     if size(X, 1) == 0 || size(X, 2) == 0
         throw(ArgumentError("X must be a non-empty matrix"))
     end
@@ -647,27 +618,20 @@ function fit!(model::DC, X::Matrix{Float64})
 
     for i in 1:model.max_try
 
-        D = compute_objective_function(X, model.centroids,k)
+        D = compute_objective_function(X, model.centroids,model.k)
 
         model.labels = assign_center(D)
-
-        new_centroids = update_centroids_dc(X, model.labels, model)
-
-
+        new_centroids = update_centroids(X, model.labels, model)
         for j in 1:model.k
             if !(j in model.labels)
                 new_centroids[j, :] = X[rand(1:size(X, 1)), :]
             end
         end
-
         if maximum(sqrt.(sum((model.centroids .- new_centroids) .^ 2, dims=2))) < model.tol
             break
         end
-
         model.centroids = new_centroids
-
     end
-
 end
 
 """
