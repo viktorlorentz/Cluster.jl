@@ -35,27 +35,27 @@ For benchmark our project we used the dataset provided by [Marek Gagolewski](htt
 ## Visualization K-means
 ```@raw html
 <div style="text-align: center;">
-  <img src="https://github.com/viktorlorentz/Cluster.jl/blob/benchmarking_alg/test/kmeans-figures/circles.png" alt="Clustering Circles">
+  <img src="https://github.com/viktorlorentz/Cluster.jl/blob/benchmarking_alg/test/kmeans-figures/circles.png?raw=true" alt="Clustering Circles">
   <p>Figure 1: Clustering Circles with K-means</p>
 </div>
 
 <div style="text-align: center;">
-  <img src="https://github.com/viktorlorentz/Cluster.jl/blob/benchmarking_alg/test/kmeans-figures/mk1.png" alt="Mk1">
+  <img src="https://github.com/viktorlorentz/Cluster.jl/blob/benchmarking_alg/test/kmeans-figures/mk1.png?raw=true" alt="Mk1">
   <p>Figure 2: Mk1 with K-means</p>
 </div>
 
 <div style="text-align: center;">
-  <img src="https://github.com/viktorlorentz/Cluster.jl/blob/benchmarking_alg/test/kmeans-figures/mk3.png" alt="Mk1">
+  <img src="https://github.com/viktorlorentz/Cluster.jl/blob/benchmarking_alg/test/kmeans-figures/mk3.png?raw=true" alt="Mk1">
   <p>Figure 3: Mk3 with K-means</p>
 </div>
 
 <div style="text-align: center;">
-  <img src="https://github.com/viktorlorentz/Cluster.jl/blob/benchmarking_alg/test/kmeans-figures/z3.png" alt="Mk1">
+  <img src="https://github.com/viktorlorentz/Cluster.jl/blob/benchmarking_alg/test/kmeans-figures/z3.png?raw=true" alt="Mk1">
   <p>Figure 4: Z3 with K-means</p>
 </div>
 
 <div style="text-align: center;">
-  <img src="https://github.com/viktorlorentz/Cluster.jl/blob/benchmarking_alg/test/kmeans-figures/trajectories.png" alt="Mk1">
+  <img src="https://github.com/viktorlorentz/Cluster.jl/blob/benchmarking_alg/test/kmeans-figures/trajectories.png?raw=true" alt="Mk1">
   <p>Figure 5: Trajectories with K-means</p>
 </div>
 ```
