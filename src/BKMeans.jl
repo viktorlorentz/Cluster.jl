@@ -56,7 +56,7 @@ function fit!(model::BKMeans, X::Matrix{Float64})
     clusters = [X]
 
     while length(clusters) < model.k
-        sse = [sum(compute_distance(clusters[i], mean(clusters[i], dims=1)) .^ 2) for i in 1:length(clusters)]
+        sse = [sum(compute_distance(clusters[i], mean(clusters[i], dims=1)) .^ 2) for i in eachindex(clusters)]
         i = argmax(sse)
         sub_model = deepcopy(model.kmeans)
         fit!(sub_model, clusters[i])
@@ -71,7 +71,7 @@ function fit!(model::BKMeans, X::Matrix{Float64})
     end
     model.labels = Int[]
     model.centroids = zeros(Float64, length(clusters), size(X, 2))
-    for g1 in 1:length(clusters)
+    for g1 in eachindex(clusters)
         model.centroids[g1, :] = mean(clusters[g1], dims=1)[:]
         rows, _ = size(clusters[g1])
         for g2 in 1:rows
