@@ -70,9 +70,9 @@ end
 
 # Function to create subplots
 function create_subplots(data, labels, predicted_labels, num_classes, model)
-    fig = plot(layout = (3, 1), size=(800, 1400))
+    fig = plot(layout = (1, 2), size=(1000, 700))
     plot_sample_data!(fig[1], data, labels, num_classes, "Sample Data")
-    plot_sample_data!(fig[2], data, predicted_labels, num_classes, "Prediction")
+    plot_sample_data!(fig[2], data, predicted_labels, num_classes, "Predictions and Decision Boundaries")
 
     # Mark wrong predictions with an "x"
     wrong_predictions = labels .!= predicted_labels
@@ -81,16 +81,18 @@ function create_subplots(data, labels, predicted_labels, num_classes, model)
     # Create a grid of points
     x_min, x_max = minimum(data[:, 1]), maximum(data[:, 1])
     y_min, y_max = minimum(data[:, 2]), maximum(data[:, 2])
-    x_grid = range(x_min, x_max, length=100)
-    y_grid = range(y_min, y_max, length=100)
-    grid_x, grid_y = repeat(x_grid, inner=100), repeat(y_grid, outer=100)
+    x_grid = range(x_min, x_max, length=500)
+    y_grid = range(y_min, y_max, length=500)
+    grid_x, grid_y = repeat(x_grid, inner=500), repeat(y_grid, outer=500)
     grid_points = hcat(grid_x, grid_y)
 
     # Predict labels for the grid points
     grid_labels = Cluster.predict(model, grid_points)
 
-    # Plot the color map using scatter
-    scatter!(fig[3], grid_x, grid_y, color=grid_labels, marker=:rect, markerstrokewidth=0,ms=4, title="Decision Boundary", legend=false)
+    grid_labels_matrix = reshape(grid_labels, (500, 500))
+
+	# Plot the decision boundaries
+    contour!(fig[2], x_grid, y_grid, grid_labels_matrix, linecolor=:black, linewidth=1, colorbar=:none)
 
     return fig
 end
@@ -123,8 +125,6 @@ md"Seed:\
 $(@bind seed Slider(0:1000000, default=123, show_value=true))\
 Samples per class:\
 $(@bind num_samples_per_class Slider(5:200, default=20, show_value=true))\
-Features/ Dimensions:\
-$(@bind num_features Slider(1:2 , default=2, show_value=true))\
 Classes:\
 $(@bind num_classes Slider(1:25 , default=3, show_value=true))\
 Spread of cluster:\
@@ -135,6 +135,7 @@ $(@bind clustering_algorithm Select([\"kmeans\", \"kmeanspp\", \"bkmeans\"]))\
 
 # ╔═╡ 726f9420-db77-442a-9fa3-09a1dad985c4
 begin
+	num_features=2
     # Generate sample data
     data, labels = create_data(num_samples_per_class, num_features, 			num_classes, spread = spread, seed = seed)
 
