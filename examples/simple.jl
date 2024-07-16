@@ -25,7 +25,7 @@ println("Data: ", data[1:3, :])
 println("Shape: ", size(data))
 
 # Initialize the clustering algorithm
-model = Cluster.KMeans(k=3, mode="kmeans") # also supports "kmeanspp"
+model = Cluster.KMeans(k=3)
 
 # Fit the model to the data
 Cluster.fit!(model, data)

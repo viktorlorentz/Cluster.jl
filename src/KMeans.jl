@@ -5,7 +5,7 @@ A mutable struct for the KMeans clustering algorithm.
 
 ### Fields
 - `k::Int`: Number of clusters.
-- `mode::String`: Initialization mode, either "kmeans" or "kmeanspp".
+- `mode::Symbol`: Initialization mode, either `:random` or `:kmeanspp`.
 - `max_try::Int`: Maximum number of iterations.
 - `tol::Float64`: Tolerance for convergence.
 - `centroids::Array{Float64,2}`: Matrix of centroid coordinates.
@@ -13,13 +13,13 @@ A mutable struct for the KMeans clustering algorithm.
 
 ### Examples
 ```julia-repl
-julia> model = KMeans(k=3, mode="kmeans", max_try=100, tol=1e-4)
-KMeans(3, "kmeans", 100, 0.0001, Matrix{Float64}(undef, 0, 0), Int64[])
+julia> model = KMeans(k=3, mode=:kmeanspp, max_try=100, tol=1e-4)
+KMeans(3, :kmeanspp, 100, 0.0001, Matrix{Float64}(undef, 0, 0), Int64[])
 ```
 """
 mutable struct KMeans
     k::Int
-    mode::String
+    mode::Symbol
     max_try::Int
     tol::Float64
     centroids::Array{Float64,2}
@@ -27,13 +27,13 @@ mutable struct KMeans
 end
 
 """
-    KMeans(; k::Int=3, mode::String="kmeans", max_try::Int=100, tol::Float64=1e-4)
+    KMeans(; k::Int=3, mode::Symbol=:kmeanspp, max_try::Int=100, tol::Float64=1e-4)
 
 Constructor for the KMeans struct.
 
 ### Input
 - `k::Int`: Number of clusters (default: 3).
-- `mode::String`: Initialization mode, either "kmeans" or "kmeanspp" (default: "kmeans").
+- `mode::Symbol`: Initialization mode, either `:random` or `:kmeanspp` (default: :kmeanspp).
 - `max_try::Int`: Maximum number of iterations (default: 100).
 - `tol::Float64`: Tolerance for convergence (default: 1e-4).
 
@@ -42,11 +42,11 @@ Constructor for the KMeans struct.
 
 ### Examples
 ```julia-repl
-julia> model = KMeans(k=3, mode="kmeans", max_try=100, tol=1e-4)
-KMeans(3, "kmeans", 100, 0.0001, Matrix{Float64}(undef, 0, 0), Int64[])
+julia> model = KMeans(k=3, mode=:kmeanspp, max_try=100, tol=1e-4)
+KMeans(3, :kmeanspp, 100, 0.0001, Matrix{Float64}(undef, 0, 0), Int64[])
 ```
 """
-function KMeans(; k::Int=3, mode::String="kmeans", max_try::Int=100, tol::Float64=1e-4)
+function KMeans(; k::Int=3, mode::Symbol=:kmeanspp, max_try::Int=100, tol::Float64=1e-4)
     if !isa(k, Int) || k <= 0
         throw(ArgumentError("k must be a positive integer"))
     end
@@ -56,8 +56,8 @@ function KMeans(; k::Int=3, mode::String="kmeans", max_try::Int=100, tol::Float6
     if !isa(tol, Float64) || tol <= 0
         throw(ArgumentError("tol must be a positive number"))
     end
-    if mode != "kmeans" && mode != "kmeanspp"
-        throw(ArgumentError("mode must be either 'kmeans' or 'kmeanspp'"))
+    if mode != :random && mode != :kmeanspp
+        throw(ArgumentError("mode must be either :random or :kmeanspp"))
     end
     return KMeans(k, mode, max_try, tol, zeros(Float64, 0, 0), Int[])
 end

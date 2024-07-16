@@ -5,7 +5,7 @@ A mutable struct for the Density-based Clustering (DC) algorithm.
 
 ### Fields
 - `k::Int`: Number of clusters.
-- `mode::String`: Initialization mode, either "kmeans", "kmeanspp", or "dc".
+- `mode::Symbol`: Initialization mode, either `:random` or `:kmeanspp`.
 - `max_try::Int`: Maximum number of iterations.
 - `tol::Float64`: Tolerance for convergence.
 - `centroids::Array{Float64,2}`: Matrix of centroid coordinates.
@@ -13,13 +13,13 @@ A mutable struct for the Density-based Clustering (DC) algorithm.
 
 ### Examples
 ```julia-repl
-julia> model = DC(k=3, mode="dc", max_try=100, tol=1e-4)
-DC(3, "dc", 100, 0.0001, Matrix{Float64}(undef, 0, 0), Int64[])
+julia> model = DC(k=3, mode=:random, max_try=100, tol=1e-4)
+DC(3, :random, 100, 0.0001, Matrix{Float64}(undef, 0, 0), Int64[])
 ```
 """
 mutable struct DC
     k::Int
-    mode::String
+    mode::Symbol
     max_try::Int
     tol::Float64
     centroids::Array{Float64,2}
@@ -27,13 +27,13 @@ mutable struct DC
 end
 
 """
-    DC(; k::Int=3, mode::String="dc", max_try::Int=100, tol::Float64=1e-4)
+    DC(; k::Int=3, mode::Symbol=:kmeanspp, max_try::Int=100, tol::Float64=1e-4)
 
 Constructor for the DC struct.
 
 ### Input
 - `k::Int`: Number of clusters (default: 3).
-- `mode::String`: Initialization mode, either "kmeans", "kmeanspp", or "dc" (default: "dc").
+- `mode::Symbol`: Initialization mode, either `:random` or `:kmeanspp`(default: :kmeanspp).
 - `max_try::Int`: Maximum number of iterations (default: 100).
 - `tol::Float64`: Tolerance for convergence (default: 1e-4).
 
@@ -42,11 +42,11 @@ Constructor for the DC struct.
 
 ### Examples
 ```julia-repl
-julia> model = DC(k=3, mode="dc", max_try=100, tol=1e-4)
-DC(3, "dc", 100, 0.0001, Matrix{Float64}(undef, 0, 0), Int64[])
+julia> model = DC(k=3, mode=:kmeanspp, max_try=100, tol=1e-4)
+DC(3, :kmeanspp, 100, 0.0001, Matrix{Float64}(undef, 0, 0), Int64[])
 ```
 """
-function DC(; k::Int=3, mode::String="dc", max_try::Int=100, tol::Float64=1e-4)
+function DC(; k::Int=3, mode::Symbol=:kmeanspp, max_try::Int=100, tol::Float64=1e-4)
     if !isa(k, Int) || k <= 0
         throw(ArgumentError("k must be a positive integer"))
     end
@@ -56,8 +56,8 @@ function DC(; k::Int=3, mode::String="dc", max_try::Int=100, tol::Float64=1e-4)
     if !isa(tol, Float64) || tol <= 0
         throw(ArgumentError("tol must be a positive number"))
     end
-    if mode != "kmeans" && mode != "kmeanspp" && mode != "dc"
-        throw(ArgumentError("mode must be either 'kmeans', 'kmeanspp', or 'dc'"))
+    if mode != :random && mode != :kmeanspp && mode != :dc
+        throw(ArgumentError("mode must be either :random or :kmeanspp"))
     end
     return DC(k, mode, max_try, tol, zeros(Float64, 0, 0), Int[])
 end

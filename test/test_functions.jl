@@ -10,7 +10,7 @@ using .Utils
         data = [1.0 2.0; 3.0 4.0; 5.0 6.0]
 
 
-        for mode in ["kmeans", "kmeanspp", "dc"]
+        for mode in [:random , :kmeanspp]
             centroids = init_centroids(data, 2, mode)
 
             # Test if the function returns the correct number of centroids
@@ -25,9 +25,9 @@ using .Utils
         end
 
         # Test if the function throws an error when the number of centroids is invalid
-        @test_throws ArgumentError init_centroids(data, 0, "kmeans")
-        @test_throws ArgumentError init_centroids(data, -1, "kmeans")
-        @test_throws ArgumentError init_centroids(data, 2, "invalid_mode")
+        @test_throws ArgumentError init_centroids(data, 0, :random)
+        @test_throws ArgumentError init_centroids(data, -1, :random)
+        @test_throws ArgumentError init_centroids(data, 2, :invalid_mode)
 
 
     end

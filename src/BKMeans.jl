@@ -11,9 +11,9 @@ A mutable struct for the Bisecting KMeans clustering algorithm.
 
 ### Examples
 ```julia-repl
-julia> kmeans_model = KMeans(k=2, mode="kmeans")
+julia> kmeans_model = KMeans(k=2, mode=:kmeanspp)
 julia> model = BKMeans(k=3, kmeans=kmeans_model)
-BKMeans(3, KMeans(2, "kmeans", 100, 0.0001, Matrix{Float64}(undef, 0, 0), Int64[]), Int64[], Matrix{Float64}(undef, 0, 0))
+BKMeans(3, KMeans(2, :kmeanspp, 100, 0.0001, Matrix{Float64}(undef, 0, 0), Int64[]), Int64[], Matrix{Float64}(undef, 0, 0))
 ```
 """
 mutable struct BKMeans
@@ -24,25 +24,25 @@ mutable struct BKMeans
 end
 
 """
-    BKMeans(; k::Int=3, kmeans::KMeans=KMeans(k=2, mode="kmeans"))
+    BKMeans(; k::Int=3, kmeans::KMeans=KMeans(k=2, mode=:kmeanspp))
 
 Constructor for the BKMeans struct.
 
 ### Input
 - `k::Int`: Number of clusters (default: 3).
-- `kmeans::KMeans`: An instance of the KMeans struct used for bisecting (default: KMeans(k=2, mode="kmeans")).
+- `kmeans::KMeans`: An instance of the KMeans struct used for bisecting (default: KMeans(k=2, mode=:kmeanspp)).
 
 ### Output
 - Returns an instance of `BKMeans`.
 
 ### Examples
 ```julia-repl
-julia> kmeans_model = KMeans(k=2, mode="kmeans")
+julia> kmeans_model = KMeans(k=2, mode=:kmeanspp)
 julia> model = BKMeans(k=3, kmeans=kmeans_model)
-BKMeans(3, KMeans(2, "kmeans", 100, 0.0001, Matrix{Float64}(undef, 0, 0), Int64[]), Int64[], Matrix{Float64}(undef, 0, 0))
+BKMeans(3, KMeans(2, :kmeanspp, 100, 0.0001, Matrix{Float64}(undef, 0, 0), Int64[]), Int64[], Matrix{Float64}(undef, 0, 0))
 ```
 """
-function BKMeans(; k::Int=3, kmeans::KMeans=KMeans(k=2, mode="kmeans"))
+function BKMeans(; k::Int=3, kmeans::KMeans=KMeans(k=2, mode=:kmeanspp))
     if !isa(k, Int) || k <= 0
         throw(ArgumentError("k must be a positive integer"))
     end
@@ -75,7 +75,7 @@ Fits the BKMeans model to the data matrix X.
 
 ### Examples
 ```julia-repl
-julia> kmeans_model = KMeans(k=2, mode="kmeans")
+julia> kmeans_model = KMeans(k=2, mode=:kmeanspp)
 julia> model = BKMeans(k=3, kmeans=kmeans_model)
 julia> X = rand(100, 2)
 julia> fit!(model, X)
@@ -127,7 +127,7 @@ Predicts the cluster labels for new data points based on the fitted BKMeans mode
 
 ### Examples
 ```julia-repl
-julia> kmeans_model = KMeans(k=2, mode="kmeans")
+julia> kmeans_model = KMeans(k=2, mode=:kmeanspp)
 julia> model = BKMeans(k=3, kmeans=kmeans_model)
 julia> X_train = rand(100, 2)
 julia> fit!(model, X_train)

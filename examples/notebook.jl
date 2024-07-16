@@ -130,7 +130,9 @@ $(@bind num_classes Slider(1:25 , default=3, show_value=true))\
 Spread of cluster:\
 $(@bind spread Slider(0:0.1:10 , default=4, show_value=true)))\
 Clustering algorithm:\
-$(@bind clustering_algorithm Select([\"kmeans\", \"kmeanspp\", \"bkmeans\"]))\
+$(@bind clustering_algorithm Select([\"kmeans\", \"kmeanspp\", \"bkmeans\", \"dc\"]))\
+Initialization:\
+$(@bind init_mode Select([:random, :kmeanspp]))\
 "
 
 # ╔═╡ 726f9420-db77-442a-9fa3-09a1dad985c4
@@ -141,14 +143,17 @@ begin
 
     # Select clustering algorithm
     if clustering_algorithm == "kmeans"
-        model = Cluster.KMeans(k=num_classes, mode="kmeans")
+        model = Cluster.KMeans(k=num_classes, mode=:random)
 
     elseif clustering_algorithm == "kmeanspp"
-        model = Cluster.KMeans(k=num_classes, mode="kmeanspp")
+        model = Cluster.KMeans(k=num_classes, mode=:kmeanspp)
 
     elseif clustering_algorithm == "bkmeans"
-        base_model = KMeans(k=2, mode="kmeans")
+        base_model = KMeans(k=2, mode=init_mode)
         model = BKMeans(k=num_classes, kmeans=base_model)
+
+    elseif clustering_algorithm == "dc"
+        model = DC(k=num_classes, mode=init_mode)
     end
 
     # Fit the model

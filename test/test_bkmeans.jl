@@ -17,7 +17,7 @@ using .Utils
                 train_data, train_labels, test_data, test_labels = split_data(data, labels, TRAIN_TEST_RATIO)
 
                 # Create and fit BKMeans model
-                base_model = KMeans(k=2, mode="kmeans")
+                base_model = KMeans(k=2, mode=:random)
                 model = BKMeans(k=num_classes, kmeans=base_model)
 
                 # Suppress and capture any output during fit!
@@ -56,8 +56,8 @@ using .Utils
         @test_throws TypeError BKMeans(k=2, kmeans=KMeans(k=2, tol="not_a_number")) # tol must be a number
         @test_throws TypeError BKMeans(k=2, kmeans=KMeans(k=2, max_try="not_a_number")) # max_try must be an integer
         @test_throws TypeError BKMeans(k="not_a_number") # k must be an integer
-        @test_throws TypeError BKMeans(k=2, kmeans=KMeans(k=2, mode=:invalid_mode)) # mode must be a valid symbol
-        @test_throws ArgumentError BKMeans(k=2, kmeans=KMeans(k=2, mode="invalid_mode")) # mode must be a valid symbol
+        @test_throws TypeError BKMeans(k=2, kmeans=KMeans(k=2, mode=":invalid_mode")) # mode must be a valid symbol
+        @test_throws ArgumentError BKMeans(k=2, kmeans=KMeans(k=2, mode=:invalid_mode)) # mode must be a valid symbol
     end
 
     @testset "BKMeans no print output" begin
