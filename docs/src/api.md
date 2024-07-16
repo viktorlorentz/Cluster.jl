@@ -14,7 +14,7 @@ All functions used by all algorithms.
 
 ```@autodocs; canonical=false
 Modules = [Cluster]
-Pages = ["utils.jl"]
+Pages = ["src/utils.jl"]
 ```
 
 ## KMeans / KMeans++ Clustering Algorithm
@@ -29,7 +29,7 @@ References:
 
 ```@autodocs; canonical=false
 Modules = [Cluster]
-Pages = ["KMeans.jl"]
+Pages = ["src/KMeans.jl"]
 ```
 
 ## Bisecting KMeans Clustering Algorithm
@@ -43,7 +43,7 @@ References:
 
 ```@autodocs; canonical=false
 Modules = [Cluster]
-Pages = ["BKMeans.jl"]
+Pages = ["src/BKMeans.jl"]
 ```
 
 ## Distributional Clustering Method
@@ -53,7 +53,7 @@ References:
 
 ```@autodocs; canonical=false
 Modules = [Cluster]
-Pages = ["DC.jl"]
+Pages = ["src/DC.jl"]
 ```
 
 ## Full list of available functions
