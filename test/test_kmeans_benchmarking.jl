@@ -21,7 +21,7 @@ using .Plotting
                 train_data, train_labels, test_data, test_labels = split_data(data, labels, TRAIN_TEST_RATIO)
 
                 # Create and fit KMeans model
-                model = KMeans(k=num_classes, mode="kmeans")
+                model = KMeans(k=num_classes, mode=:random)
 
                 # Suppress and capture any output during fit!
                 fit!(model, train_data)

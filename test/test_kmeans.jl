@@ -17,7 +17,7 @@ using .Utils
                 train_data, train_labels, test_data, test_labels = split_data(data, labels, TRAIN_TEST_RATIO)
 
                 # Create and fit KMeans model
-                model = KMeans(k=num_classes, mode="kmeans")
+                model = KMeans(k=num_classes, mode=:random)
 
                 # Suppress and capture any output during fit!
                 output = @capture_out begin
@@ -58,8 +58,8 @@ using .Utils
         @test_throws TypeError KMeans(k=2, tol="not_a_number") # tol must be a number
         @test_throws TypeError KMeans(k=2, max_try="not_a_number") # max_try must be an integer
         @test_throws TypeError KMeans(k="not_a_number") # k must be an integer
-        @test_throws TypeError KMeans(k=2, mode=:invalid_mode) # mode must be a valid symbol
-        @test_throws ArgumentError KMeans(k=2, mode="invalid_mode") # mode must be a valid symbol
+        @test_throws TypeError KMeans(k=2, mode=":invalid_mode") # mode must be a valid symbol
+        @test_throws ArgumentError KMeans(k=2, mode=:invalid_mode) # mode must be a valid symbol
     end
 
     @testset "K-means no print output" begin
