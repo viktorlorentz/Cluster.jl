@@ -1,18 +1,22 @@
 """
     mutable struct KMeans
 
-A structure representing a KMeans clustering model.
+A mutable struct for the KMeans clustering algorithm.
 
 # Fields
-- `k::Int`: The number of clusters.
-- `mode::Symbol`: The mode of initialization (`:kmeans` or `:kmeans++`).
-- `max_try::Int`: The maximum number of iterations for the algorithm.
-- `tol::Float64`: The tolerance for convergence.
-- `centroids::Array{Float64,2}`: The centroids of the clusters.
-- `labels::Array{Int,1}`: The labels assigned to each data point.
+- `k::Int`: Number of clusters.
+- `mode::String`: Initialization mode, either "kmeans" or "kmeanspp".
+- `max_try::Int`: Maximum number of iterations.
+- `tol::Float64`: Tolerance for convergence.
+- `centroids::Array{Float64,2}`: Matrix of centroid coordinates.
+- `labels::Array{Int,1}`: Vector of labels for each data point.
 
+# Examples
+```julia-repl
+julia> model = KMeans(k=3, mode="kmeans", max_try=100, tol=1e-4)
+KMeans(3, "kmeans", 100, 0.0001, Matrix{Float64}(undef, 0, 0), Int64[])
+```
 """
-
 mutable struct KMeans
     k::Int
     mode::String
@@ -22,21 +26,25 @@ mutable struct KMeans
     labels::Array{Int,1}
 end
 
-# Constructor
 """
-    KMeans(; k::Int=3, mode::Symbol=:kmeans, max_try::Int=100, tol::Float64=1e-4) -> KMeans
+    KMeans(; k::Int=3, mode::String="kmeans", max_try::Int=100, tol::Float64=1e-4)
 
-Creates a new KMeans clustering model.
+Constructor for the KMeans struct.
 
-# Keyword Arguments
-- `k::Int`: The number of clusters (default: 3).
-- `mode::Symbol`: The mode of initialization (`:kmeans` or `:kmeans++`, default: `:kmeans`).
-- `max_try::Int`: The maximum number of iterations for the algorithm (default: 100).
-- `tol::Float64`: The tolerance for convergence (default: 1e-4).
+# Input
+- `k::Int`: Number of clusters (default: 3).
+- `mode::String`: Initialization mode, either "kmeans" or "kmeanspp" (default: "kmeans").
+- `max_try::Int`: Maximum number of iterations (default: 100).
+- `tol::Float64`: Tolerance for convergence (default: 1e-4).
 
-# Returns
-A `KMeans` model with the specified parameters.
+# Output
+- Returns an instance of `KMeans`.
 
+# Examples
+```julia-repl
+julia> model = KMeans(k=3, mode="kmeans", max_try=100, tol=1e-4)
+KMeans(3, "kmeans", 100, 0.0001, Matrix{Float64}(undef, 0, 0), Int64[])
+```
 """
 function KMeans(; k::Int=3, mode::String="kmeans", max_try::Int=100, tol::Float64=1e-4)
     if !isa(k, Int) || k <= 0
@@ -55,26 +63,30 @@ function KMeans(; k::Int=3, mode::String="kmeans", max_try::Int=100, tol::Float6
 end
 
 """
-    fit!(model::KMeans, X)
+    fit!(model::KMeans, X::Matrix{Float64})
 
-Runs the KMeans algorithm for the given data and model.
+Fits the KMeans model to the data matrix X.
 
-# Arguments
-- `model::KMeans`: The KMeans model to be trained.
-- `X`: The input data matrix where each row is a data point.
+# Input
+- `model::KMeans`: An instance of `KMeans`.
+- `X::Matrix{Float64}`: Data matrix where rows are data points and columns are features.
+
+# Output
+- Modifies the `model` in-place to fit the data.
+
+# Algorithm
+1. Initialize centroids.
+2. Iterate up to `max_try` times:
+    a. Compute distances between data points and centroids.
+    b. Assign each data point to the nearest centroid.
+    c. Update centroids based on the mean of assigned data points.
+    d. Check for convergence based on `tol`.
 
 # Examples
 ```julia-repl
-model = KMeans(k=3, mode=:kmeans)
-X = [
-    1.0 1.0;
-    1.5 2.0;
-    3.0 4.0;
-    5.0 6.0;
-    8.0 9.0;
-    10.0 11.0
-]
-fit!(model, X)
+julia> model = KMeans(k=3)
+julia> X = rand(100, 2)
+julia> fit!(model, X)
 ```
 """
 function fit!(model::KMeans, X::Matrix{Float64})
@@ -103,29 +115,31 @@ function fit!(model::KMeans, X::Matrix{Float64})
 end
 
 """
-    compute_distance(data, centroids) -> Array
+    compute_distance(X::Matrix{Float64}, centroids::Matrix{Float64})
 
-Computes the distance from each data point to each centroid.
+Computes the distance between each data point in X and each centroid.
 
-# Arguments
-- `data`: The input data matrix where each row is a data point.
-- `centroids`: The current centroids.
+# Input
+- `X::Matrix{Float64}`: Data matrix where rows are data points and columns are features.
+- `centroids::Matrix{Float64}`: Matrix of centroid coordinates.
 
-# Returns
-A distance matrix `D` of size (number of data points, number of centroids), where `D[i, j]` is the distance from data point `i` to centroid `j`.
+# Output
+- Returns a distance matrix where element (i, j) is the distance between the i-th data point and the j-th centroid.
 
 # Examples
 ```julia-repl
-X = [
-    1.0 1.0;
-    1.5 2.0;
-    3.0 4.0
-]
-centroids = [
-    1.0 1.0;
-    3.0 4.0
-]
-D = compute_distance(X, centroids)
+julia> X = rand(100, 2)
+julia> centroids = rand(3, 2)
+julia> D = compute_distance(X, centroids)
+100×3 Matrix{Float64}:
+ 0.181333  0.539578  0.306867
+ 0.754863  0.48797   0.562147
+ 0.205116  0.360735  0.127107
+ 0.154926  0.552747  0.323433
+ ⋮
+ 0.434321  0.321914  0.261909
+ 0.773258  0.291669  0.513668
+ 0.607547  0.310411  0.38714
 ```
 """
 function compute_distance(X::Matrix{Float64}, centroids::Matrix{Float64})
@@ -142,24 +156,20 @@ function compute_distance(X::Matrix{Float64}, centroids::Matrix{Float64})
 end
 
 """
-    assign_center(D) -> Array
+    assign_center(D::Matrix{Float64})
 
-Returns the index of the nearest centroid for each data point.
+Assigns each data point to the nearest centroid based on the distance matrix D.
 
-# Arguments
-- `D`: The distance matrix.
+# Input
+- `D::Matrix{Float64}`: Distance matrix where element (i, j) is the distance between the i-th data point and the j-th centroid.
 
-# Returns
-An array of indices indicating the nearest centroid for each data point.
+# Output
+- Returns a vector of labels where each element is the index of the nearest centroid for the corresponding data point.
 
 # Examples
 ```julia-repl
-D = [
-    0.0 2.0;
-    1.0 1.0;
-    2.0 0.0
-]
-labels = assign_center(D)
+julia> D = rand(100, 3)
+julia> labels = assign_center(D)
 ```
 """
 function assign_center(D::Matrix{Float64})
@@ -167,29 +177,24 @@ function assign_center(D::Matrix{Float64})
 end
 
 """
-    update_centroids(data, labelvector, model) -> Array
+    update_centroids(X::Matrix{Float64}, label_vector::Vector{Int64}, model::KMeans)
 
-Calculates new centroids based on the given data and label vector.
+Updates the centroids based on the current assignment of data points to centroids.
 
-# Arguments
-- `data`: The input data matrix where each row is a data point.
-- `labelvector`: The current labels of the data points.
-- `model`: The KMeans model.
+# Input
+- `X::Matrix{Float64}`: Data matrix where rows are data points and columns are features.
+- `label_vector::Vector{Int64}`: Vector of labels for each data point.
+- `model::KMeans`: An instance of `KMeans`.
 
-# Returns
-An array of new centroids.
+# Output
+- Returns a matrix of updated centroid coordinates.
 
 # Examples
 ```julia-repl
-X = [
-    1.0 1.0;
-    1.5 2.0;
-    3.0 4.0;
-    5.0 6.0
-]
-labels = [1, 1, 2, 2]
-model = KMeans(k=2)
-new_centroids = update_centroids(X, labels, model)
+julia> X = rand(100, 2)
+julia> labels = rand(1:3, 100)
+julia> model = KMeans(k=3)
+julia> centroids = update_centroids(X, labels, model)
 ```
 """
 function update_centroids(X::Matrix{Float64}, label_vector::Vector{Int64}, model::KMeans)
@@ -205,39 +210,24 @@ function update_centroids(X::Matrix{Float64}, label_vector::Vector{Int64}, model
 end
 
 """
-    predict(model, data) -> Array
+    predict(model::KMeans, X::Matrix{Float64})
 
-Returns the cluster labels for the given data points.
+Predicts the cluster labels for new data points based on the fitted model.
 
-# Arguments
-- `model::KMeans`: The trained KMeans model.
-- `X::Array{Float64,2}`: The input data matrix where each row is a data point.
+# Input
+- `model::KMeans`: An instance of `KMeans`.
+- `X::Matrix{Float64}`: Data matrix where rows are data points and columns are features.
 
-# Returns
-An array of cluster labels for each data point.
+# Output
+- Returns a vector of predicted labels for each data point.
 
 # Examples
 ```julia-repl
-data = [
-    # Cluster 1
-    1.0 1.0 1.5;
-    1.5 2.0 1.6;
-    1.3 1.8 1.4;
-    # Cluster 2
-    5.0 7.0 3.5;
-    5.5 7.5 3.5;
-    6.0 7.0 3.5;
-    # Cluster 3
-    8.0 1.0 6.5;
-    8.5 1.5 6.5;
-    8.3 1.2 7.5;
-]
-test_data = [1.1 1.1 1.2]
-model = KMeans(k=3)
-fit!(
-
-model, data)
-labels = predict(model, test_data)
+julia> model = KMeans(k=3)
+julia> X_train = rand(100, 2)
+julia> fit!(model, X_train)
+julia> X_test = rand(10, 2)
+julia> labels = predict(model, X_test)
 ```
 """
 function predict(model::KMeans, X::Matrix{Float64})
