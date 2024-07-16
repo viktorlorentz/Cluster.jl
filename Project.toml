@@ -1,7 +1,7 @@
 name = "Cluster"
 uuid = "a199801d-da2f-495f-981e-bf842e0b3fa3"
 authors = ["Mohamad Bassel Fatloun<fatloun@campus.tu-berlin.de>", "Viktor Lorentz<lorentz@campus.tu-berlin.de>", "Florentin Marquardt<marquardt@campus.tu-berlin.de>", "Omadbek Meliev<meliev@campus.tu-berlin.de>"]
-version = "0.0.0"
+version = "0.1.0"
 
 [deps]
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
