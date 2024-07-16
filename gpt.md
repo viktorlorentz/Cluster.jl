@@ -54,3 +54,55 @@ if mode == 1 ## TODO initialize not by numbers but by string or similiar!!
     centroids = X[idx, :]
 end
 
+
+Moreover, we used GPT to preprocess the data in a benchmark. Code below:
+function data_preprocessing(dataset_path, battery, dataset)
+    """
+    Preprocess data and labels from Gzip compressed files
+
+    Args:
+        dataset_path (String): Path to the dataset
+        battery (String, optional): Dataset name directory
+        dataset (String, optional): Name of the dataset files
+
+    Returns:
+        Tuple{Matrix{Float64}, Vector{Vector{Int}}}:
+            Return a matrix with columns as features and rows as datapoints
+    """
+
+    full_path = joinpath(dataset_path, battery, dataset)
+    data_file = full_path * ".data.gz"
+
+    # Check whether dataset exist
+    if !isfile(data_file)
+        error("Data file not found: $data_file")
+    end
+
+    data = Matrix(gzopen(data_file) do f
+        readdlm(f, Float64)
+    end)
+
+    # load labels files
+    labels = Vector{Vector{Int}}()
+    i = 0
+    while true
+        label_file = full_path * ".labels$i.gz"
+        if !isfile(label_file)
+            break
+        end
+
+        push!(labels, gzopen(label_file) do f
+            vec(readdlm(f, Int))
+        end)
+        i += 1
+    end
+
+    # Check whether we have labels for the dataset
+    if isempty(labels)
+        error("No label files found for dataset: $dataset")
+    end
+
+    return data, labels, dataset
+    
+end
+
