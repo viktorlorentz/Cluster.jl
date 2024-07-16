@@ -56,7 +56,7 @@ function DC(; k::Int=3, mode::Symbol=:kmeanspp, max_try::Int=100, tol::Float64=1
     if !isa(tol, Float64) || tol <= 0
         throw(ArgumentError("tol must be a positive number"))
     end
-    if mode != :random && mode != :kmeanspp && mode != :dc
+    if mode != :random && mode != :kmeanspp
         throw(ArgumentError("mode must be either :random or :kmeanspp"))
     end
     return DC(k, mode, max_try, tol, zeros(Float64, 0, 0), Int[])
