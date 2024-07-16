@@ -1,3 +1,15 @@
+"""
+    mutable struct BKMeans
+
+    A structure representing a Bisecting KMeans clustering model.
+
+    # Fields
+    - `k::Int`: The number of clusters.
+    - `kmeans::KMeans`: An instance of the KMeans model used for cluster splitting.
+    - `labels::Array{Int,1}`: The labels assigned to each data point.
+    - `centroids::Array{Float64,2}`: The centroids of the clusters.
+
+"""
 mutable struct BKMeans
     k::Int
     kmeans::KMeans
