@@ -1,14 +1,20 @@
 """
     mutable struct BKMeans
 
-    A structure representing a Bisecting KMeans clustering model.
+A mutable struct for the Bisecting KMeans clustering algorithm.
 
-    # Fields
-    - `k::Int`: The number of clusters.
-    - `kmeans::KMeans`: An instance of the KMeans model used for cluster splitting.
-    - `labels::Array{Int,1}`: The labels assigned to each data point.
-    - `centroids::Array{Float64,2}`: The centroids of the clusters.
+### Fields
+- `k::Int`: Number of clusters.
+- `kmeans::KMeans`: An instance of the KMeans struct used for bisecting.
+- `labels::Array{Int,1}`: Vector of labels for each data point.
+- `centroids::Matrix{Float64}`: Matrix of centroid coordinates.
 
+### Examples
+```julia-repl
+julia> kmeans_model = KMeans(k=2, mode="kmeans")
+julia> model = BKMeans(k=3, kmeans=kmeans_model)
+BKMeans(3, KMeans(2, "kmeans", 100, 0.0001, Matrix{Float64}(undef, 0, 0), Int64[]), Int64[], Matrix{Float64}(undef, 0, 0))
+```
 """
 mutable struct BKMeans
     k::Int
@@ -20,14 +26,21 @@ end
 """
     BKMeans(; k::Int=3, kmeans::KMeans=KMeans(k=2, mode="kmeans"))
 
-Creates a new BKMeans clustering model.
+Constructor for the BKMeans struct.
 
-Keyword Arguments:
-- `k::Int`: The number of clusters (default: 3).
-- `kmeans::KMeans`: An instance of the KMeans model used for cluster splitting (default: KMeans with 2 clusters).
+### Input
+- `k::Int`: Number of clusters (default: 3).
+- `kmeans::KMeans`: An instance of the KMeans struct used for bisecting (default: KMeans(k=2, mode="kmeans")).
 
-Returns:
-A `BKMeans` model with the specified parameters.
+### Output
+- Returns an instance of `BKMeans`.
+
+### Examples
+```julia-repl
+julia> kmeans_model = KMeans(k=2, mode="kmeans")
+julia> model = BKMeans(k=3, kmeans=kmeans_model)
+BKMeans(3, KMeans(2, "kmeans", 100, 0.0001, Matrix{Float64}(undef, 0, 0), Int64[]), Int64[], Matrix{Float64}(undef, 0, 0))
+```
 """
 function BKMeans(; k::Int=3, kmeans::KMeans=KMeans(k=2, mode="kmeans"))
     if !isa(k, Int) || k <= 0
@@ -40,13 +53,33 @@ function BKMeans(; k::Int=3, kmeans::KMeans=KMeans(k=2, mode="kmeans"))
 end
 
 """
-    fit!(model::BKMeans, X)
+    fit!(model::BKMeans, X::Matrix{Float64})
 
-Runs the Bisecting KMeans algorithm for the given data and model.
+Fits the BKMeans model to the data matrix X.
 
-Arguments:
-- `model::BKMeans`: The BKMeans model to be trained.
-- `X`: The input data matrix where each row is a data point.
+### Input
+- `model::BKMeans`: An instance of `BKMeans`.
+- `X::Matrix{Float64}`: Data matrix where rows are data points and columns are features.
+
+### Output
+- Modifies the `model` in-place to fit the data.
+
+### Algorithm
+1. Initialize clusters with the entire dataset.
+2. While the number of clusters is less than `k`:
+    a. Compute the sum of squared errors (SSE) for each cluster.
+    b. Select the cluster with the highest SSE.
+    c. Apply KMeans to bisect the selected cluster.
+    d. Replace the selected cluster with the two resulting clusters.
+3. Assign labels and centroids based on the final clusters.
+
+### Examples
+```julia-repl
+julia> kmeans_model = KMeans(k=2, mode="kmeans")
+julia> model = BKMeans(k=3, kmeans=kmeans_model)
+julia> X = rand(100, 2)
+julia> fit!(model, X)
+```
 """
 function fit!(model::BKMeans, X::Matrix{Float64})
     if size(X, 1) == 0 || size(X, 2) == 0
@@ -81,18 +114,28 @@ function fit!(model::BKMeans, X::Matrix{Float64})
 end
 
 """
-    predict(model::BKMeans, X) -> Array
+    predict(model::BKMeans, X::Matrix{Float64})
 
-Returns the cluster labels for the given data points using the trained BKMeans model.
+Predicts the cluster labels for new data points based on the fitted BKMeans model.
 
-Arguments:
-- `model::BKMeans`: The trained BKMeans model.
-- `X::Array{Float64,2}`: The input data matrix where each row is a data point.
+### Input
+- `model::BKMeans`: An instance of `BKMeans`.
+- `X::Matrix{Float64}`: Data matrix where rows are data points and columns are features.
 
-Returns:
-An array of cluster labels for each data point.
+### Output
+- Returns a vector of predicted labels for each data point.
+
+### Examples
+```julia-repl
+julia> kmeans_model = KMeans(k=2, mode="kmeans")
+julia> model = BKMeans(k=3, kmeans=kmeans_model)
+julia> X_train = rand(100, 2)
+julia> fit!(model, X_train)
+julia> X_test = rand(10, 2)
+julia> labels = predict(model, X_test)
+```
 """
-function predict(model::BKMeans, X)
+function predict(model::BKMeans, X::Matrix{Float64})
     D = compute_distance(X, model.centroids)
     return assign_center(D)
 end

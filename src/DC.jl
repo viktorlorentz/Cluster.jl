@@ -1,4 +1,22 @@
+"""
+    mutable struct DC
 
+A mutable struct for the Density-based Clustering (DC) algorithm.
+
+### Fields
+- `k::Int`: Number of clusters.
+- `mode::String`: Initialization mode, either "kmeans", "kmeanspp", or "dc".
+- `max_try::Int`: Maximum number of iterations.
+- `tol::Float64`: Tolerance for convergence.
+- `centroids::Array{Float64,2}`: Matrix of centroid coordinates.
+- `labels::Array{Int,1}`: Vector of labels for each data point.
+
+### Examples
+```julia-repl
+julia> model = DC(k=3, mode="dc", max_try=100, tol=1e-4)
+DC(3, "dc", 100, 0.0001, Matrix{Float64}(undef, 0, 0), Int64[])
+```
+"""
 mutable struct DC
     k::Int
     mode::String
@@ -8,20 +26,25 @@ mutable struct DC
     labels::Array{Int,1}
 end
 
-# Constructor
 """
-    DC(; k::Int=3, mode::Symbol=:kmeans, max_try::Int=100, tol::Float64=1e-4) -> DC
+    DC(; k::Int=3, mode::String="dc", max_try::Int=100, tol::Float64=1e-4)
 
-Creates a new DC clustering model.
+Constructor for the DC struct.
 
-# Keyword Arguments
-- `k::Int`: The number of clusters (default: 3).
-- `mode::Symbol`: The mode of initialization (`:kmeans` or `:kmeans++`, default: `:kmeans`).
-- `max_try::Int`: The maximum number of iterations for the algorithm (default: 100).
-- `tol::Float64`: The tolerance for convergence (default: 1e-4).
+### Input
+- `k::Int`: Number of clusters (default: 3).
+- `mode::String`: Initialization mode, either "kmeans", "kmeanspp", or "dc" (default: "dc").
+- `max_try::Int`: Maximum number of iterations (default: 100).
+- `tol::Float64`: Tolerance for convergence (default: 1e-4).
 
-# Returns
-A `DC` model with the specified parameters.
+### Output
+- Returns an instance of `DC`.
+
+### Examples
+```julia-repl
+julia> model = DC(k=3, mode="dc", max_try=100, tol=1e-4)
+DC(3, "dc", 100, 0.0001, Matrix{Float64}(undef, 0, 0), Int64[])
+```
 """
 function DC(; k::Int=3, mode::String="dc", max_try::Int=100, tol::Float64=1e-4)
     if !isa(k, Int) || k <= 0
@@ -40,32 +63,24 @@ function DC(; k::Int=3, mode::String="dc", max_try::Int=100, tol::Float64=1e-4)
 end
 
 """
-    compute_objective_function(data, centroids, k) -> Array
+    compute_objective_function(X::Matrix{Float64}, centroids::Matrix{Float64}; p=2, delta=0.0001)
 
-Computes the distance from each data point to each centroid.
+Computes the objective function for the DC algorithm.
 
-# Arguments
-- `data`: The input data matrix where each row is a data point.
-- `centroids`: The current centroids.
-- `k`: the exponent of norm
+### Input
+- `X::Matrix{Float64}`: Data matrix where rows are data points and columns are features.
+- `centroids::Matrix{Float64}`: Matrix of centroid coordinates.
+- `p`: Power parameter for the distance metric (default: 2).
+- `delta`: Small constant to avoid division by zero (default: 0.0001).
 
-# Returns
-A distance matrix `D` of size (number of data points, number of centroids), where `D[i, j]` is the distance from data point `i` to centroid `j`.
+### Output
+- Returns a distance matrix where element (i, j) is the distance between the i-th data point and the j-th centroid.
 
-# Examples
+### Examples
 ```julia-repl
-X = [
-    1.0 1.0;
-    1.5 2.0;
-    3.0 4.0
-
-
-]
-centroids = [
-    1.0 1.0;
-    3.0 4.0
-]
-D = compute_objective_function(X, centroids)
+julia> X = rand(100, 2)
+julia> centroids = rand(3, 2)
+julia> D = compute_objective_function(X, centroids)
 ```
 """
 function compute_objective_function(X::Matrix{Float64}, centroids::Matrix{Float64}; p=2, delta=0.0001)
@@ -82,29 +97,25 @@ function compute_objective_function(X::Matrix{Float64}, centroids::Matrix{Float6
 end
 
 """
-    update_centroids(data, labelvector, model) -> Array
+    update_centroids(X::Matrix{Float64}, label_vector::Vector{Int64}, model::DC; delta=0.0001)
 
-Calculates new centroids based on the given data and label vector.
+Updates the centroids based on the current assignment of data points to centroids.
 
-# Arguments
-- `data`: The input data matrix where each row is a data point.
-- `labelvector`: The current labels of the data points.
-- `model`: The KMeans model.
+### Input
+- `X::Matrix{Float64}`: Data matrix where rows are data points and columns are features.
+- `label_vector::Vector{Int64}`: Vector of labels for each data point.
+- `model::DC`: An instance of `DC`.
+- `delta`: Small constant to avoid division by zero (default: 0.0001).
 
-# Returns
-An array of new centroids.
+### Output
+- Returns a matrix of updated centroid coordinates.
 
-# Examples
+### Examples
 ```julia-repl
-X = [
-    1.0 1.0;
-    1.5 2.0;
-    3.0 4.0;
-    5.0 6.0
-]
-labels = [1, 1, 2, 2]
-model = KMeans(k=2)
-new_centroids = update_centroids(X, labels, model)
+julia> X = rand(100, 2)
+julia> labels = rand(1:3, 100)
+julia> model = DC(k=3)
+julia> centroids = update_centroids(X, labels, model)
 ```
 """
 function update_centroids(X::Matrix{Float64}, label_vector::Vector{Int64}, model::DC; delta=0.0001)
@@ -131,27 +142,30 @@ function update_centroids(X::Matrix{Float64}, label_vector::Vector{Int64}, model
 end
 
 """
-    fit!(model::DC, X)
+    fit!(model::DC, X::Matrix{Float64})
 
-Runs the Distributional Clustering algorithm for the given data and model.
+Fits the DC model to the data matrix X.
 
-# Arguments
-- `model::DC`: The DC model to be trained.
-- `X`: The input data matrix where each row is a data point.
-- `k`: Exponent of the norm
+### Input
+- `model::DC`: An instance of `DC`.
+- `X::Matrix{Float64}`: Data matrix where rows are data points and columns are features.
 
-# Examples
+### Output
+- Modifies the `model` in-place to fit the data.
+
+### Algorithm
+1. Initialize centroids.
+2. Iterate up to `max_try` times:
+    a. Compute the objective function between data points and centroids.
+    b. Assign each data point to the nearest centroid.
+    c. Update centroids based on the current assignment.
+    d. Check for convergence based on `tol`.
+
+### Examples
 ```julia-repl
-model = DC(3, "dc", 20, 1e-4, zeros(Float64, 0, 0), Int[])
-X = [
-    1.0 1.0;
-    1.5 2.0;
-    3.0 4.0;
-    5.0 6.0;
-    8.0 9.0;
-    10.0 11.0
-]
-fit!(model, X)
+julia> model = DC(k=3)
+julia> X = rand(100, 2)
+julia> fit!(model, X)
 ```
 """
 function fit!(model::DC, X::Matrix{Float64})
@@ -178,37 +192,24 @@ function fit!(model::DC, X::Matrix{Float64})
 end
 
 """
-    predict(model::DC, X) -> Array
+    predict(model::DC, X::Matrix{Float64})
 
-Returns the cluster labels for the given data points.
+Predicts the cluster labels for new data points based on the fitted DC model.
 
-# Arguments
-- `model::DC`: The trained DC model.
-- `X::Array{Float64,2}`: The input data matrix where each row is a data point.
+### Input
+- `model::DC`: An instance of `DC`.
+- `X::Matrix{Float64}`: Data matrix where rows are data points and columns are features.
 
-# Returns
-An array of cluster labels for each data point.
+### Output
+- Returns a vector of predicted labels for each data point.
 
-# Examples
+### Examples
 ```julia-repl
-data = [
-    # Cluster 1
-    1.0 1.0 1.5;
-    1.5 2.0 1.6;
-    1.3 1.8 1.4;
-    # Cluster 2
-    5.0 7.0 3.5;
-    5.5 7.5 3.5;
-    6.0 7.0 3.5;
-    # Cluster 3
-    8.0 1.0 6.5;
-    8.5 1.5 6.5;
-    8.3 1.2 7.5;
-]
-test_data = [1.1 1.1 1.2]
-model = DC(k=3)
-fit!(model, data)
-labels = predict(model, test_data)
+julia> model = DC(k=3)
+julia> X_train = rand(100, 2)
+julia> fit!(model, X_train)
+julia> X_test = rand(10, 2)
+julia> labels = predict(model, X_test)
 ```
 """
 function predict(model::DC, X::Matrix{Float64})

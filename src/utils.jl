@@ -1,31 +1,33 @@
-
-
 """
+    init_centroids(X::Matrix{Float64}, K::Int64, mode::String)
 
+Initializes centroids for the clustering algorithm based on the specified mode.
 
-Initialize centroids for the chosen algorithm.
+### Input
+- `X::Matrix{Float64}`: Data matrix where rows are data points and columns are features.
+- `K::Int64`: Number of clusters.
+- `mode::String`: Initialization mode, either "kmeans", "kmeanspp", or "dc".
 
-# Arguments
-- `X::Array{Float64,2}`: The input data matrix where each row is a data point.
-- `K::Int`: The number of clusters.
-- `mode::Symbol`: The mode of initialization (`:kmeans` or `:kmeans++`).
+### Output
+- Returns a matrix of initialized centroid coordinates.
 
-## Fields
+### Algorithm
+1. If `mode` is "kmeans" or "dc":
+    - Randomly select K data points from X as initial centroids.
+2. If `mode` is "kmeanspp":
+    - Initialize the first centroid randomly.
+    - For each subsequent centroid:
+        a. Compute the distance from each data point to the nearest centroid.
+        b. Select the next centroid with probability proportional to the squared distance.
 
-
-# Examples
-```@repl
-X = [
-    1.0 1.0;
-    1.5 2.0;
-    3.0 4.0;
-    5.0 6.0;
-    8.0 9.0;
-    10.0 11.0
-]
-K = 2
-mode = :kmeans
-centroids = init_centroids(X, K, mode)
+### Examples
+```julia-repl
+julia> X = rand(100, 2)
+julia> centroids = init_centroids(X, 3, "kmeans")
+3×2 Matrix{Float64}:
+ 0.386814  0.619566
+ 0.170768  0.0176449
+ 0.38688   0.398064
 ```
 """
 function init_centroids(X::Matrix{Float64}, K::Int64, mode::String)
@@ -33,7 +35,7 @@ function init_centroids(X::Matrix{Float64}, K::Int64, mode::String)
         throw(ArgumentError("K must be a positive integer"))
     end
     if mode != "kmeans" && mode != "kmeanspp" && mode != "dc"
-        throw(ArgumentError("mode must be either 'kmeans' or 'kmeanspp'"))
+        throw(ArgumentError("mode must be either 'kmeans', 'kmeanspp', or 'dc'"))
     end
 
     if mode == "kmeans"
