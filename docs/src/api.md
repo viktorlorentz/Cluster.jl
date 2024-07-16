@@ -5,7 +5,7 @@ CurrentModule = Cluster
 
 ```@contents
 Pages = ["api.md"]
-Depth = 5
+Depth = 2:3
 ```
 
 ## Utility functions
